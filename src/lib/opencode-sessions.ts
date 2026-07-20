@@ -1,5 +1,5 @@
 import { existsSync, readdirSync, statSync } from 'node:fs'
-import { join } from 'node:path'
+import { basename, join } from 'node:path'
 import { spawnSync } from 'node:child_process'
 import Database from 'better-sqlite3'
 import { config } from './config'
@@ -211,7 +211,7 @@ export function scanOpenCodeSessions(limit = 100): OpenCodeSessionStats[] {
           : undefined
 
         const projectPath = project?.worktree || session.directory || null
-        const projectSlug = projectPath ? projectPath.split('/').filter(Boolean).pop() || 'opencode' : 'opencode'
+        const projectSlug = projectPath ? basename(projectPath) || 'opencode' : 'opencode'
 
         let userMessages = 0
         let assistantMessages = 0
