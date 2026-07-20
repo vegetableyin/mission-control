@@ -21,14 +21,14 @@ async function switchLocale(page: Page, locale: string) {
 }
 
 test.describe('i18n Language Switcher', () => {
-  test('login page renders English by default', async ({ page }) => {
+  test('login page renders Simplified Chinese by default', async ({ page }) => {
     await page.context().clearCookies()
     await page.goto('/login')
 
-    await expect(page.locator('text=Sign in to continue')).toBeVisible()
-    await expect(page.locator('text=Username')).toBeVisible()
-    await expect(page.locator('text=Password')).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Sign in' })).toBeVisible()
+    await expect(page.locator('text=登录以继续')).toBeVisible()
+    await expect(page.locator('text=用户名')).toBeVisible()
+    await expect(page.locator('text=密码')).toBeVisible()
+    await expect(page.getByRole('button', { name: '登录' })).toBeVisible()
   })
 
   test('language switcher shows all 10 languages', async ({ page }) => {
@@ -40,7 +40,7 @@ test.describe('i18n Language Switcher', () => {
     const options = await select.locator('option').allTextContents()
     expect(options).toHaveLength(10)
     expect(options).toContain('English')
-    expect(options).toContain('中文')
+    expect(options).toContain('简体中文')
     expect(options).toContain('日本語')
     expect(options).toContain('한국어')
     expect(options).toContain('Español')

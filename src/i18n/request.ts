@@ -1,5 +1,5 @@
 import { getRequestConfig } from 'next-intl/server'
-import { cookies, headers } from 'next/headers'
+import { cookies } from 'next/headers'
 import { locales, defaultLocale, type Locale } from './config'
 
 export default getRequestConfig(async () => {
@@ -10,17 +10,6 @@ export default getRequestConfig(async () => {
   const cookieLocale = cookieStore.get('NEXT_LOCALE')?.value as Locale | undefined
   if (cookieLocale && locales.includes(cookieLocale)) {
     locale = cookieLocale
-  } else {
-    // 2. Fall back to Accept-Language header
-    const headerStore = await headers()
-    const acceptLang = headerStore.get('accept-language') || ''
-    const preferred = acceptLang
-      .split(',')
-      .map((part) => part.split(';')[0].trim().substring(0, 2).toLowerCase())
-      .find((code) => locales.includes(code as Locale))
-    if (preferred) {
-      locale = preferred as Locale
-    }
   }
 
   return {

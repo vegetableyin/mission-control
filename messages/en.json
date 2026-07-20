@@ -79,20 +79,23 @@
   },
   "nav": {
     "overview": "Overview",
+    "projects": "Projects",
     "agents": "Agents",
     "tasks": "Tasks",
+    "codex": "Codex",
+    "attention": "Attention",
     "chat": "Chat",
     "channels": "Channels",
     "skills": "Skills",
     "memory": "Memory",
-    "activity": "Activity",
+    "activity": "Activity Log",
     "logs": "Logs",
     "costTracker": "Cost Tracker",
     "nodes": "Nodes",
     "approvals": "Approvals",
     "office": "Office",
     "logout": "Logout",
-    "cron": "Cron",
+    "cron": "Schedules",
     "webhooks": "Webhooks",
     "alerts": "Alerts",
     "github": "GitHub",
@@ -143,7 +146,16 @@
     "onboarding": "Onboarding",
     "onboardingDescription": "Replay the setup wizard and reset the dashboard checklist",
     "replayOnboarding": "Replay Onboarding",
-    "resetting": "Resetting..."
+    "resetting": "Resetting...",
+    "interfaceMode": {
+      "title": "Interface Mode",
+      "description": "Choose a focused daily view or the complete Mission Control workspace.",
+      "essentialLabel": "Essential",
+      "essentialDescription": "Daily command center: Overview, Projects, Tasks, Codex, Schedules, Attention, Activity Log, and Settings.",
+      "fullLabel": "Full",
+      "fullDescription": "All original panels and advanced capabilities, including Agents, Chat, Memory, Skills, Office, security, and gateway tooling.",
+      "footerHint": "You can also switch modes from the account menu in the sidebar."
+    }
   },
   "boot": {
     "missionControl": "Mission Control",
@@ -2208,5 +2220,34 @@
     "restarting": "Restarting...",
     "diagnosing": "Diagnosing...",
     "notInstalled": "Not installed"
+  },
+  "essentialDashboard": {
+    "title": "Personal Command Center",
+    "subtitle": "Exceptions and decisions first, using current Mission Control data.",
+    "loading": "Loading dashboard data...",
+    "loadError": "Some local data could not be loaded. Available sections remain visible.",
+    "viewAll": "View all",
+    "waitingTask": "Waiting for confirmation",
+    "failedTask": "Failed task",
+    "blockedTask": "Blocked task",
+    "alert": "Alert",
+    "metrics": { "activeProjects": "Active projects", "blockedProjects": "Blocked projects", "todayTasks": "Today's tasks", "failedTasks": "Failed tasks", "waiting": "Waiting for confirmation", "staleProjects": "Long inactive" },
+    "attention": { "title": "Today's attention", "empty": "Nothing currently needs your attention." },
+    "projects": { "title": "Project status", "empty": "No projects yet.", "name": "Project", "status": "Status", "lastActivity": "Last activity", "open": "Open", "failed": "Failed", "next": "Open tasks" },
+    "status": { "blocked": "Blocked", "stale": "Inactive", "active": "Active", "inactive": "Inactive" },
+    "codex": { "title": "Codex status", "running": "Running sessions", "idle": "Idle sessions", "empty": "No recent Codex sessions." },
+    "schedules": { "title": "Schedules", "ranToday": "Ran today", "failedToday": "Failed today", "nextRun": "Next run", "paused": "Paused" },
+    "activity": { "title": "Recent activity", "empty": "No recent activity." }
+  },
+  "projectsOverview": {
+    "title": "Projects", "description": "Current project health and workload based on existing tasks.", "manage": "Manage projects", "loading": "Loading projects...", "empty": "No projects have been created.", "create": "Create project", "name": "Project", "status": "Status", "lastActivity": "Last activity", "unfinished": "Open tasks", "failed": "Failed tasks", "openTasks": "Open tasks", "blocked": "Blocked", "stale": "Long inactive", "active": "Active"
+  },
+  "codexStatus": {
+    "title": "Codex", "description": "Existing Codex CLI installation and local session visibility. No new execution mechanism is introduced.", "installation": "CLI status", "login": "Login status", "version": "CLI version", "activeSessions": "Active sessions", "tokenUsage": "Visible token usage", "checking": "Checking...", "configurationError": "Codex runtime detection returned an error. Review the local CLI configuration in Settings.", "sessions": "Codex sessions", "empty": "No Codex sessions were found.", "session": "Session", "projectDirectory": "Project directory", "model": "Model", "tokens": "Tokens", "lastActivity": "Last activity", "state": "State", "privacyNote": "This view uses the existing runtime and session APIs. It never reads or displays auth.json.",
+    "status": { "normal": "Normal", "notInstalled": "Not installed", "notLoggedIn": "Not logged in", "configError": "Configuration error", "running": "Running", "idle": "Idle", "failed": "Failed", "loggedIn": "Logged in" }
+  },
+  "attentionCenter": {
+    "title": "Attention", "description": "A local aggregation of approvals, failures, blocks, alerts, and scheduled-run failures.", "loading": "Loading attention items...", "openItems": "Open items", "empty": "No open items require action.", "approval": "Approval request", "approvalDetail": "An execution request is waiting for a decision.", "waitingTaskDetail": "This task is waiting for owner confirmation or review.", "failedTaskDetail": "The task failed without a recorded error message.", "blockedTaskDetail": "Existing task metadata marks this task as blocked.", "securityAlertDetail": "A security alert rule has been triggered.", "alertDetail": "Triggered {count} times.", "scheduleFailureDetail": "The most recent scheduled run failed.", "viewDetails": "View details", "markHandled": "Mark handled", "ignore": "Ignore for now", "dismissed": "Handled or ignored ({count})", "restore": "Restore", "localStateNote": "Handled and ignored states are stored only in this browser. Source task, alert, approval, and schedule records are unchanged.",
+    "kind": { "approval": "Waiting approval", "failed": "Failed tasks", "blocked": "Blocked tasks", "security": "Security alerts", "schedule": "Recent run failures" }
   }
 }

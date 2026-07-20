@@ -79,19 +79,22 @@
   },
   "nav": {
     "overview": "概览",
+    "projects": "项目",
     "agents": "智能体",
     "tasks": "任务",
+    "codex": "Codex",
+    "attention": "待处理",
     "chat": "聊天",
     "channels": "频道",
     "skills": "技能",
     "memory": "记忆",
-    "activity": "活动",
+    "activity": "活动记录",
     "logs": "日志",
     "costTracker": "费用追踪",
     "nodes": "节点",
     "approvals": "审批",
     "office": "办公室",
-    "cron": "Cron",
+    "cron": "定时任务",
     "webhooks": "Webhooks",
     "alerts": "告警",
     "github": "GitHub",
@@ -143,7 +146,16 @@
     "onboarding": "引导设置",
     "onboardingDescription": "重放设置向导并重置仪表板清单",
     "replayOnboarding": "重放引导",
-    "resetting": "重置中..."
+    "resetting": "重置中...",
+    "interfaceMode": {
+      "title": "界面模式",
+      "description": "选择日常使用的精简驾驶舱，或完整的 Mission Control 工作区。",
+      "essentialLabel": "精简模式 Essential",
+      "essentialDescription": "仅显示总览、项目、任务、Codex、定时任务、待处理、活动记录和设置。",
+      "fullLabel": "完整模式 Full",
+      "fullDescription": "保留原项目全部面板及高级能力，包括智能体、聊天、记忆、技能、办公室、安全和网关工具。",
+      "footerHint": "也可以从侧边栏底部的账户菜单切换。"
+    }
   },
   "boot": {
     "missionControl": "Mission Control",
@@ -982,6 +994,10 @@
   },
   "taskBoard": {
     "title": "任务看板",
+    "loadingTasks": "正在加载任务...",
+    "spawnLabelPlaceholder": "会话标签",
+    "timeoutSeconds": "超时秒数",
+    "taskBoard": "任务看板",
     "allProjects": "所有项目",
     "projects": "项目",
     "close": "关闭",
@@ -2204,5 +2220,34 @@
     "tabStatus": "状态",
     "unhealthy": "不健康",
     "unreachable": "不可达"
+  },
+  "essentialDashboard": {
+    "title": "个人驾驶舱",
+    "subtitle": "优先呈现异常、决策和需要人工参与的事项，数据均来自现有 Mission Control。",
+    "loading": "正在加载驾驶舱数据...",
+    "loadError": "部分本地数据加载失败，已显示仍可用的区域。",
+    "viewAll": "查看全部",
+    "waitingTask": "等待确认",
+    "failedTask": "失败任务",
+    "blockedTask": "阻塞任务",
+    "alert": "告警",
+    "metrics": { "activeProjects": "进行中项目", "blockedProjects": "阻塞项目", "todayTasks": "今日任务", "failedTasks": "失败任务", "waiting": "等待确认", "staleProjects": "长时间无活动" },
+    "attention": { "title": "今日待处理", "empty": "目前没有需要你处理的事项。" },
+    "projects": { "title": "项目状态", "empty": "尚未创建项目。", "name": "项目名称", "status": "状态", "lastActivity": "最近活动", "open": "未完成", "failed": "失败", "next": "查看任务" },
+    "status": { "blocked": "阻塞", "stale": "长期无活动", "active": "进行中", "inactive": "非活跃" },
+    "codex": { "title": "Codex 状态", "running": "运行中会话", "idle": "空闲会话", "empty": "暂无最近的 Codex 会话。" },
+    "schedules": { "title": "定时任务", "ranToday": "今日已执行", "failedToday": "今日失败", "nextRun": "下次执行", "paused": "已暂停" },
+    "activity": { "title": "最近活动", "empty": "暂无最近活动。" }
+  },
+  "projectsOverview": {
+    "title": "项目", "description": "根据现有项目和任务数据展示当前健康状态与工作量。", "manage": "管理项目", "loading": "正在加载项目...", "empty": "尚未创建项目。", "create": "创建项目", "name": "项目名称", "status": "状态", "lastActivity": "最近活动", "unfinished": "未完成任务", "failed": "失败任务", "openTasks": "查看任务", "blocked": "阻塞", "stale": "长期无活动", "active": "进行中"
+  },
+  "codexStatus": {
+    "title": "Codex", "description": "整理现有 Codex CLI 安装和本地会话观察能力，不增加新的执行机制。", "installation": "CLI 状态", "login": "登录状态", "version": "CLI 版本", "activeSessions": "活动会话", "tokenUsage": "可见 Token 用量", "checking": "正在检测...", "configurationError": "Codex 运行时检测返回错误，请在设置中检查本地 CLI 配置。", "sessions": "Codex 会话", "empty": "未发现 Codex 会话。", "session": "会话", "projectDirectory": "所属项目目录", "model": "当前模型", "tokens": "Token", "lastActivity": "最近活动", "state": "会话状态", "privacyNote": "本页面只使用现有运行时和会话 API，不读取或展示 auth.json。",
+    "status": { "normal": "正常", "notInstalled": "未安装", "notLoggedIn": "未登录", "configError": "配置异常", "running": "运行中", "idle": "空闲", "failed": "失败", "loggedIn": "已登录" }
+  },
+  "attentionCenter": {
+    "title": "待处理", "description": "聚合现有审批、失败、阻塞、告警和定时任务运行失败记录。", "loading": "正在加载待处理事项...", "openItems": "当前待处理", "empty": "目前没有需要人工处理的事项。", "approval": "审批请求", "approvalDetail": "有一项执行请求正在等待决策。", "waitingTaskDetail": "此任务正在等待所有者确认或审查。", "failedTaskDetail": "任务失败，但没有记录错误信息。", "blockedTaskDetail": "现有任务元数据将此任务标记为阻塞。", "securityAlertDetail": "安全告警规则已触发。", "alertDetail": "已触发 {count} 次。", "scheduleFailureDetail": "最近一次定时执行失败。", "viewDetails": "查看详情", "markHandled": "标记已处理", "ignore": "暂时忽略", "dismissed": "已处理或忽略（{count}）", "restore": "恢复", "localStateNote": "“已处理”和“暂时忽略”仅保存在当前浏览器，不会修改原任务、告警、审批或定时任务记录。",
+    "kind": { "approval": "等待审批", "failed": "失败任务", "blocked": "阻塞任务", "security": "安全告警", "schedule": "最近运行失败" }
   }
 }
