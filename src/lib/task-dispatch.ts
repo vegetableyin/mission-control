@@ -10,6 +10,7 @@ import { getAllGatewaySessions } from './sessions'
 import { parseJsonlTranscript, readSessionJsonl, type TranscriptMessage } from './transcript-parser'
 import { syncTaskOutbound } from './github-sync-engine'
 import { classifyModelProvider, getDispatchModelId, getModelByAlias } from './models'
+import { detectBinary, getBinaryInvocation } from './executable-discovery'
 import type Database from 'better-sqlite3'
 
 const AGENT_DISPATCH_ACCEPT_TIMEOUT_MS = 60_000
@@ -892,14 +893,20 @@ function isClaudeCliAvailable(): boolean {
  * OPENAI_API_KEY — same idea as the Claude Code CLI path above.
  */
 let codexCliAvailableCache: boolean | null = null
+let codexCliPathCache: string | null = null
 function isCodexCliAvailable(): boolean {
   try {
     if (codexCliAvailableCache !== null) return codexCliAvailableCache
-    const { spawnSync } = require('node:child_process')
-    const r = spawnSync('codex', ['--version'], { stdio: 'ignore', timeout: 5000 })
-    codexCliAvailableCache = r.status === 0
+    const detected = detectBinary(['codex', 'codex-cli'])
+    codexCliPathCache = detected.resolvedBin
+    codexCliAvailableCache = detected.installed
     return codexCliAvailableCache
   } catch { return false }
+}
+
+function getCodexCliInvocation(args: string[]) {
+  if (codexCliAvailableCache === null) isCodexCliAvailable()
+  return getBinaryInvocation(codexCliPathCache || 'codex', args)
 }
 
 function isDirectDispatchAvailable(provider?: DirectProvider): boolean {
@@ -1092,7 +1099,8 @@ async function callCodexViaCli(
   )
 
   return await new Promise<AgentResponseParsed>((resolve, reject) => {
-    const proc = spawn('codex', args, {
+    const invocation = getCodexCliInvocation(args)
+    const proc = spawn(invocation.command, invocation.args, {
       stdio: ['pipe', 'pipe', 'pipe'],
       env: { ...process.env },
       ...(dispatchCwd ? { cwd: dispatchCwd } : {}),

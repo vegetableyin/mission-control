@@ -1,6 +1,7 @@
 import { spawn } from 'node:child_process'
 import path from 'node:path'
 import { config } from './config'
+import { getBinaryInvocation } from './executable-discovery'
 
 interface CommandOptions {
   cwd?: string
@@ -22,8 +23,11 @@ export function runCommand(
   options: CommandOptions = {}
 ): Promise<CommandResult> {
   return new Promise((resolve, reject) => {
-    const spawnCommand = path.extname(command).toLowerCase() === '.mjs' ? process.execPath : command
-    const spawnArgs = spawnCommand === process.execPath ? [command, ...args] : args
+    const invocation = path.extname(command).toLowerCase() === '.mjs'
+      ? { command: process.execPath, args: [command, ...args] }
+      : getBinaryInvocation(command, args)
+    const spawnCommand = invocation.command
+    const spawnArgs = invocation.args
     const child = spawn(spawnCommand, spawnArgs, {
       cwd: options.cwd,
       env: options.env,

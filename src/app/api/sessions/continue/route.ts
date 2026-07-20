@@ -7,6 +7,7 @@ import { logger } from '@/lib/logger'
 import { denyUnscopedResourceForStrictWorkspace } from '@/lib/workspace-isolation'
 import { runCommand } from '@/lib/command'
 import { getOpenCodeExecutable } from '@/lib/opencode-sessions'
+import { detectBinary } from '@/lib/executable-discovery'
 
 /**
  * Resolve a CLI binary to an absolute path by scanning PATH directories.
@@ -260,25 +261,27 @@ export async function POST(request: NextRequest) {
         }
       }
     } else if (kind === 'codex-cli') {
-      const outputPath = path.join('/tmp', `mc-codex-last-${Date.now()}-${Math.random().toString(36).slice(2)}.txt`)
+      const outputPath = path.join(os.tmpdir(), `mc-codex-last-${Date.now()}-${Math.random().toString(36).slice(2)}.txt`)
       try {
-        await runCommand('codex', ['exec', 'resume', sessionId, prompt, '--skip-git-repo-check', '-o', outputPath], {
-          timeoutMs: 180000,
-        })
+        const codexBin = detectBinary(['codex', 'codex-cli']).resolvedBin || 'codex'
+        let commandError: unknown
+        try {
+          await runCommand(codexBin, ['exec', 'resume', sessionId, prompt, '--skip-git-repo-check', '-o', outputPath], {
+            timeoutMs: 180000,
+          })
+        } catch (error) {
+          commandError = error
+        }
+
+        try {
+          reply = (await fs.readFile(outputPath, 'utf-8')).trim()
+        } catch {
+          reply = ''
+        }
+
+        if (commandError) throw commandError
       } finally {
-        // Read after run attempt either way for best-effort output
-      }
-
-      try {
-        reply = (await fs.readFile(outputPath, 'utf-8')).trim()
-      } catch {
-        reply = ''
-      }
-
-      try {
-        await fs.unlink(outputPath)
-      } catch {
-        // ignore
+        await fs.unlink(outputPath).catch(() => undefined)
       }
     } else {
       const result = await runCommand(getOpenCodeExecutable(), ['run', '--session', sessionId, prompt], {
