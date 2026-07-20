@@ -1,5 +1,6 @@
 import { createHash } from 'crypto'
 import { readFileSync } from 'fs'
+import { tmpdir } from 'os'
 import { join } from 'path'
 import type Database from 'better-sqlite3'
 
@@ -920,7 +921,7 @@ const migrations: Migration[] = [
         const rawHost = String(process.env.MC_HOSTNAME || 'default').trim().toLowerCase()
         const slug = rawHost.replace(/[^a-z0-9-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 32) || 'default'
         const linuxUser = (String(process.env.USER || 'local').trim().toLowerCase().replace(/[^a-z0-9_-]+/g, '-') || 'local').slice(0, 30)
-        const home = String(process.env.HOME || '/tmp').trim() || '/tmp'
+        const home = String(process.env.HOME || tmpdir()).trim() || tmpdir()
         const insert = db.prepare(`
           INSERT INTO tenants (slug, display_name, linux_user, plan_tier, status, openclaw_home, workspace_root, config, created_by, owner_gateway)
           VALUES (?, ?, ?, 'standard', 'active', ?, ?, '{}', 'system', ?)
