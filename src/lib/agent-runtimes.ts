@@ -8,6 +8,7 @@ import { scanForInjection } from './injection-guard'
 import { isHermesInstalled, isHermesGatewayRunning, clearHermesDetectionCache } from './hermes-sessions'
 import { isOpenCodeInstalled, getOpenCodeVersion, scanOpenCodeSessions } from './opencode-sessions'
 import { logger } from './logger'
+import { detectBinary, runDetectedBinary } from './executable-discovery'
 import {
   isValidInstallerSha256,
   resolvePinnedUserToolSpec,
@@ -198,6 +199,7 @@ export interface RuntimeStatus {
   description: string
   installed: boolean
   version: string | null
+  binaryPath?: string | null
   running: boolean
   authRequired: boolean
   authHint: string
@@ -380,39 +382,6 @@ function detectHermes(): RuntimeStatus {
   return { id: 'hermes', ...meta, installed, version, running, authenticated }
 }
 
-function detectBinary(bins: string[], versionFlag = '--version'): { installed: boolean; version: string | null; resolvedBin: string | null } {
-  const { spawnSync } = require('node:child_process')
-  const homedir = require('node:os').homedir()
-  const path = require('node:path')
-
-  // Expand bare binary names with common install locations that may not be on PATH
-  const candidates: string[] = []
-  for (const bin of bins) {
-    if (!bin.includes('/')) {
-      candidates.push(
-        path.join(homedir, '.local', 'bin', bin),
-        path.join('/usr', 'local', 'bin', bin),
-        path.join(homedir, 'Library', 'pnpm', bin),  // macOS pnpm global
-        path.join(homedir, '.npm-global', 'bin', bin),
-      )
-    }
-    candidates.push(bin)
-  }
-
-  for (const bin of candidates) {
-    try {
-      const result = spawnSync(bin, [versionFlag], { stdio: 'pipe', timeout: 3000 })
-      if (result.status === 0) {
-        // Extract first meaningful line as version (skip wrapper/logging noise like [lacp])
-        const rawOutput = (result.stdout?.toString() || '').trim()
-        const versionLine = rawOutput.split('\n').find((l: string) => l.trim() && !l.trim().startsWith('['))?.trim() || rawOutput.split('\n')[0]?.trim() || null
-        return { installed: true, version: versionLine, resolvedBin: bin }
-      }
-    } catch { continue }
-  }
-  return { installed: false, version: null, resolvedBin: null }
-}
-
 function detectClaude(): RuntimeStatus {
   const meta = RUNTIME_META.claude
   const { installed, version, resolvedBin } = detectBinary(['claude'])
@@ -461,11 +430,7 @@ function detectClaude(): RuntimeStatus {
     // and any future auth mechanisms that don't write a file)
     if (!authenticated) {
       try {
-        const { spawnSync } = require('node:child_process')
-        const result = spawnSync(resolvedBin || 'claude', ['auth', 'status', '--json'], {
-          stdio: 'pipe',
-          timeout: 5000,
-        })
+        const result = runDetectedBinary(resolvedBin || 'claude', ['auth', 'status', '--json'], 5000)
         if (result.status === 0) {
           const json = JSON.parse(result.stdout?.toString() || '{}')
           authenticated = json.loggedIn === true
@@ -476,12 +441,12 @@ function detectClaude(): RuntimeStatus {
     }
   }
 
-  return { id: 'claude', ...meta, installed, version, running: false, authenticated }
+  return { id: 'claude', ...meta, installed, version, binaryPath: resolvedBin, running: false, authenticated }
 }
 
 function detectCodex(): RuntimeStatus {
   const meta = RUNTIME_META.codex
-  const { installed, version } = detectBinary(['codex', 'codex-cli'])
+  const { installed, version, resolvedBin } = detectBinary(['codex', 'codex-cli'])
 
   // Codex CLI authenticates via OPENAI_API_KEY env var or config files
   let authenticated = false
@@ -498,7 +463,7 @@ function detectCodex(): RuntimeStatus {
     }
   }
 
-  return { id: 'codex', ...meta, installed, version, running: false, authenticated }
+  return { id: 'codex', ...meta, installed, version, binaryPath: resolvedBin, running: false, authenticated }
 }
 
 function detectOpenCode(): RuntimeStatus {
