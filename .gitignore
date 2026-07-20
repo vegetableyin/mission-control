@@ -51,6 +51,7 @@ aegis/
 test-results/
 playwright-report/
 .tmp/
+/docs/ui-audit/
 .playwright-mcp/
 
 # Local QA screenshots
