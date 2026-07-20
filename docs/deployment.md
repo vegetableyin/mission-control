@@ -2,8 +2,8 @@
 
 ## Prerequisites
 
-- **Node.js** >= 20 (LTS recommended)
-- **pnpm** (installed via corepack: `corepack enable && corepack prepare pnpm@latest --activate`)
+- **Node.js** >= 22 (Node.js 22 LTS recommended)
+- **pnpm 10.29.3** (selected through Corepack from `packageManager`)
 
 ### Ubuntu / Debian
 
@@ -30,7 +30,7 @@ pnpm install
 pnpm dev
 ```
 
-Open http://localhost:3000. Login with `AUTH_USER` / `AUTH_PASS` from your `.env.local`.
+Open http://127.0.0.1:3100. Login with `AUTH_USER` / `AUTH_PASS` from your `.env.local`.
 
 ## Production (Direct)
 
@@ -40,10 +40,10 @@ pnpm build
 pnpm start
 ```
 
-The `pnpm start` script binds to `0.0.0.0:3005`. Override with:
+The `pnpm start` script binds to `127.0.0.1:3100` by default. Override the port with:
 
 ```bash
-PORT=3000 pnpm start
+PORT=3100 pnpm start
 ```
 
 **Important:** The production build bundles platform-specific native binaries. You must run `pnpm install` and `pnpm build` on the same OS and architecture as the target server. A build created on macOS will not work on Linux.
@@ -63,7 +63,7 @@ pnpm start:standalone
 For a full in-place update on the target host:
 
 ```bash
-BRANCH=fix/refactor PORT=3000 pnpm deploy:standalone
+BRANCH=fix/refactor PORT=3100 pnpm deploy:standalone
 ```
 
 What `deploy:standalone` does:

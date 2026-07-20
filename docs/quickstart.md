@@ -14,12 +14,12 @@ Get from zero to a working agent loop with nothing but Mission Control and `curl
 pnpm dev
 ```
 
-Open http://localhost:3000 and log in. If this is your first run, visit http://localhost:3000/setup to create your admin account.
+Open http://127.0.0.1:3100 and log in. If this is your first run, visit http://127.0.0.1:3100/setup to create your admin account.
 
 Your API key is displayed in **Settings > API Key**. Export it for the commands below:
 
 ```bash
-export MC_URL=http://localhost:3000
+export MC_URL=http://127.0.0.1:3100
 export MC_API_KEY=your-api-key
 ```
 

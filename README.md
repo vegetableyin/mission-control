@@ -29,7 +29,7 @@ cd mission-control
 bash install.sh --local
 ```
 
-Open `http://localhost:3000/setup`, create the first admin account, then copy the API key
+Open `http://127.0.0.1:3100/setup`, create the first admin account, then copy the API key
 from Settings if an agent or script needs headless access.
 
 The manual path is useful when you already manage Node and pnpm:
@@ -117,7 +117,7 @@ The shortest gateway-free loop uses the REST API. Export the URL and API key sho
 Settings:
 
 ```bash
-export MC_URL=http://localhost:3000
+export MC_URL=http://127.0.0.1:3100
 export MC_API_KEY=replace-with-your-api-key
 ```
 
@@ -157,7 +157,7 @@ pnpm mc events watch --types agent,task
 
 ```bash
 claude mcp add mission-control -- \
-  env MC_URL=http://127.0.0.1:3000 MC_API_KEY=replace-with-your-api-key \
+  env MC_URL=http://127.0.0.1:3100 MC_API_KEY=replace-with-your-api-key \
   node /absolute/path/to/mission-control/scripts/mc-mcp-server.cjs
 ```
 

@@ -12,7 +12,7 @@
     Deployment mode: "local" (default) or "docker".
 
 .PARAMETER Port
-    Port the Next.js server listens on (default: 3000).
+    Port the Next.js server listens on (default: 3100).
 
 .PARAMETER DataDir
     Custom data directory path (default: .data/ in project root).
@@ -38,7 +38,7 @@ param(
     [ValidateSet("local", "docker")]
     [string]$Mode = "",
 
-    [int]$Port = 3000,
+    [int]$Port = 3100,
 
     [string]$DataDir = "",
 
@@ -193,8 +193,8 @@ function New-EnvFile {
     $content = $content -replace '(?m)^# AUTH_SECRET=.*',  "AUTH_SECRET=$authSecret"
 
     # Set port if non-default
-    if ($script:Port -ne 3000) {
-        $content = $content -replace '(?m)^# PORT=3000', "PORT=$($script:Port)"
+    if ($script:Port -ne 3100) {
+        $content = $content -replace '(?m)^# PORT=3100', "PORT=$($script:Port)"
     }
 
     $content | Set-Content $envPath -NoNewline
@@ -246,12 +246,15 @@ function Deploy-Local {
 
     Push-Location $script:InstallDir
     try {
-        pnpm install --frozen-lockfile 2>$null
-        if ($LASTEXITCODE -ne 0) { pnpm install }
+        corepack pnpm install --frozen-lockfile
+        if ($LASTEXITCODE -ne 0) {
+            corepack pnpm install
+            if ($LASTEXITCODE -ne 0) { Stop-WithError "Dependency installation failed" }
+        }
         Write-Ok "Dependencies installed"
 
         Write-MC "Building Mission Control..."
-        pnpm build
+        corepack pnpm build
         if ($LASTEXITCODE -ne 0) { Stop-WithError "Build failed" }
         Write-Ok "Build complete"
 
@@ -276,7 +279,7 @@ function Deploy-Local {
         Write-MC "Starting Mission Control..."
         $env:PORT = $script:Port
         $env:NODE_ENV = "production"
-        $env:HOSTNAME = "0.0.0.0"
+        $env:HOSTNAME = "127.0.0.1"
         $dataPath = Join-Path $script:InstallDir ".data"
         $logPath = Join-Path $dataPath "mc.log"
         $errLogPath = Join-Path $dataPath "mc-err.log"
