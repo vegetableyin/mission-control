@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { spawn } from 'node:child_process'
+import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
 import { fileURLToPath } from 'node:url'
@@ -27,14 +28,34 @@ if (!host) {
 const scriptDir = path.dirname(fileURLToPath(import.meta.url))
 const repoRoot = path.resolve(scriptDir, '..')
 const nextBin = path.join(repoRoot, 'node_modules', 'next', 'dist', 'bin', 'next')
+const standaloneServer = path.join(repoRoot, '.next', 'standalone', 'server.js')
 const extraArgs = process.argv.slice(3)
+
+if (mode === 'start') {
+  try {
+    process.loadEnvFile(path.join(repoRoot, '.env'))
+  } catch (error) {
+    if (error?.code !== 'ENOENT') throw error
+  }
+}
+
+const useStandalone = mode === 'start' && fs.existsSync(standaloneServer)
+const commandArgs = useStandalone
+  ? [standaloneServer, ...extraArgs]
+  : [nextBin, mode, '--hostname', host, '--port', String(port), ...extraArgs]
+const childEnv = {
+  ...process.env,
+  ...(useStandalone ? { HOSTNAME: host } : {}),
+  PORT: String(port),
+  MISSION_CONTROL_DATA_DIR: process.env.MISSION_CONTROL_DATA_DIR || path.join(repoRoot, '.data'),
+}
 
 const child = spawn(
   process.execPath,
-  [nextBin, mode, '--hostname', host, '--port', String(port), ...extraArgs],
+  commandArgs,
   {
-    cwd: repoRoot,
-    env: process.env,
+    cwd: useStandalone ? path.dirname(standaloneServer) : repoRoot,
+    env: childEnv,
     stdio: 'inherit',
   },
 )
