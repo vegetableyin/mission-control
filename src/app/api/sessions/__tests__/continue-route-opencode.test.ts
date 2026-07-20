@@ -5,7 +5,7 @@ import path from 'node:path'
 import { POST } from '@/app/api/sessions/continue/route'
 
 const mocks = vi.hoisted(() => ({
-  runCommand: vi.fn(async () => ({ stdout: '', stderr: '', code: 0 })),
+  runCommand: vi.fn(async (_command: string, _args: string[]) => ({ stdout: '', stderr: '', code: 0 })),
 }))
 
 vi.mock('@/lib/auth', () => ({

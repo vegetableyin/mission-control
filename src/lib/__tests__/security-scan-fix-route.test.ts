@@ -161,7 +161,13 @@ describe('security-scan fix route env mutation', () => {
     const response = await POST(request(JSON.stringify({ ids: ['world_writable'] })))
 
     expect(response.status).toBe(200)
-    expect(statSync(filePath).mode & 0o777).toBe(0o664)
+    const fileMode = statSync(filePath).mode & 0o777
+    if (process.platform === 'win32') {
+      // Windows ACLs do not map the POSIX world-write bit through chmod/stat.
+      expect(fileMode & 0o111).toBe(0)
+    } else {
+      expect(fileMode).toBe(0o664)
+    }
   })
 
   it('reports a busy OpenClaw config without overwriting it', async () => {

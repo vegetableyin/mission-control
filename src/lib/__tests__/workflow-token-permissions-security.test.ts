@@ -12,7 +12,7 @@ const workflows = [
 ]
 
 function readWorkflow(name: string): string {
-  return readFileSync(join(process.cwd(), '.github/workflows', name), 'utf8')
+  return readFileSync(join(process.cwd(), '.github/workflows', name), 'utf8').replace(/\r\n/g, '\n')
 }
 
 function topLevelPermissions(source: string): string {

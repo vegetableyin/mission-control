@@ -63,7 +63,13 @@ describe('Skills route security boundaries', () => {
 
     expect(response.status).toBe(200)
     expect(await readFile(join(root, 'safe-skill', 'SKILL.md'), 'utf8')).toContain('Review work')
-    expect((await stat(join(root, 'safe-skill', 'SKILL.md'))).mode & 0o777).toBe(0o600)
+    const fileMode = (await stat(join(root, 'safe-skill', 'SKILL.md'))).mode & 0o777
+    if (process.platform === 'win32') {
+      // Windows ACLs do not expose POSIX 0600 semantics through stat().mode.
+      expect(fileMode & 0o111).toBe(0)
+    } else {
+      expect(fileMode).toBe(0o600)
+    }
     expect(auditMock).toHaveBeenCalledWith(expect.objectContaining({
       action: 'skill.upsert',
       actor: 'operator',
@@ -103,7 +109,7 @@ describe('Skills route security boundaries', () => {
 
   it('refuses reads and writes through a symlinked skill directory', async () => {
     await writeFile(join(outside, 'SKILL.md'), '# Outside\n\nDo not expose this.', 'utf8')
-    await symlink(outside, join(root, 'linked-skill'))
+    await symlink(outside, join(root, 'linked-skill'), process.platform === 'win32' ? 'junction' : 'dir')
 
     const writeResponse = await PUT(mutationRequest('PUT', {
       source: 'user-agents',

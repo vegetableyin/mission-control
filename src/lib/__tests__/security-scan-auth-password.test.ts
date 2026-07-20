@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeAll, describe, expect, it } from 'vitest'
 import { runSecurityScan } from '@/lib/security-scan'
 
 const originalAuthPass = process.env.AUTH_PASS
@@ -14,6 +14,12 @@ function authPasswordCheck() {
 }
 
 describe('security scan admin password resolution', () => {
+  beforeAll(() => {
+    // The first Windows OS scan launches real native security probes. Warm
+    // their cache under an explicit integration timeout.
+    runSecurityScan()
+  }, 15_000)
+
   afterEach(() => {
     restore('AUTH_PASS', originalAuthPass)
     restore('AUTH_PASS_B64', originalAuthPassB64)

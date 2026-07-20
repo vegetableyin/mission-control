@@ -7,11 +7,11 @@ describe('Navigation and activity client security contract', () => {
     const navSource = readFileSync(
       join(process.cwd(), 'src/components/layout/nav-rail.tsx'),
       'utf8',
-    )
+    ).replace(/\r\n/g, '\n')
     const activitySource = readFileSync(
       join(process.cwd(), 'src/components/panels/activity-feed-panel.tsx'),
       'utf8',
-    )
+    ).replace(/\r\n/g, '\n')
 
     expect(navSource.match(/apiFetch\('\/api\/settings'/g)).toHaveLength(2)
     expect(navSource).toContain("apiFetch('/api/auth/logout', { method: 'POST' })")

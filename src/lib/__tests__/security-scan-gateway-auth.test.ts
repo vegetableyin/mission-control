@@ -1,7 +1,7 @@
 import { mkdtempSync, writeFileSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Point scanOpenClaw at a real temp openclaw.json by overriding only the
 // openclawConfigPath field of the config module (every other field stays real,
@@ -34,6 +34,12 @@ function gatewayAuthStatus() {
 }
 
 describe('scanOpenClaw — gateway_auth credential handling', () => {
+  beforeAll(() => {
+    // Windows security probes are intentionally real and can exceed Vitest's
+    // per-test default on their uncached first run.
+    runSecurityScan()
+  }, 15_000)
+
   beforeEach(() => {
     writeOpenClawConfig({})
   })

@@ -16,13 +16,33 @@ import {
 } from '../gnap-sync'
 
 let tmpDir: string
+const originalGitIdentity = {
+  GIT_AUTHOR_NAME: process.env.GIT_AUTHOR_NAME,
+  GIT_AUTHOR_EMAIL: process.env.GIT_AUTHOR_EMAIL,
+  GIT_COMMITTER_NAME: process.env.GIT_COMMITTER_NAME,
+  GIT_COMMITTER_EMAIL: process.env.GIT_COMMITTER_EMAIL,
+}
+
+function restoreEnv(name: keyof typeof originalGitIdentity) {
+  const value = originalGitIdentity[name]
+  if (value === undefined) delete process.env[name]
+  else process.env[name] = value
+}
 
 beforeEach(() => {
   tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'gnap-test-'))
+  process.env.GIT_AUTHOR_NAME = 'Mission Control Test'
+  process.env.GIT_AUTHOR_EMAIL = 'mission-control-test@example.invalid'
+  process.env.GIT_COMMITTER_NAME = 'Mission Control Test'
+  process.env.GIT_COMMITTER_EMAIL = 'mission-control-test@example.invalid'
 })
 
 afterEach(() => {
   fs.rmSync(tmpDir, { recursive: true, force: true })
+  restoreEnv('GIT_AUTHOR_NAME')
+  restoreEnv('GIT_AUTHOR_EMAIL')
+  restoreEnv('GIT_COMMITTER_NAME')
+  restoreEnv('GIT_COMMITTER_EMAIL')
 })
 
 describe('status mapping', () => {
