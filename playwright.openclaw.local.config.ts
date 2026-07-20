@@ -1,5 +1,7 @@
 import { defineConfig, devices } from '@playwright/test'
 
+process.env.E2E_GATEWAY_EXPECTED = '0'
+
 export default defineConfig({
   testDir: 'tests',
   testMatch: /openclaw-harness\.spec\.ts/,
@@ -11,7 +13,7 @@ export default defineConfig({
   workers: 1,
   reporter: [['list']],
   use: {
-    baseURL: 'http://127.0.0.1:3005',
+    baseURL: 'http://127.0.0.1:3100',
     trace: 'retain-on-failure',
   },
   projects: [
@@ -19,7 +21,7 @@ export default defineConfig({
   ],
   webServer: {
     command: 'node scripts/e2e-openclaw/start-e2e-server.mjs --mode=local',
-    url: 'http://127.0.0.1:3005',
+    url: 'http://127.0.0.1:3100',
     reuseExistingServer: false,
     timeout: 120_000,
   },

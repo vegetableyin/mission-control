@@ -33,6 +33,13 @@ if (mode !== 'local' && mode !== 'gateway') {
   process.exit(1)
 }
 
+const appModeArg = process.argv.find((arg) => arg.startsWith('--app-mode='))
+const appMode = appModeArg ? appModeArg.split('=')[1] : 'development'
+if (appMode !== 'development' && appMode !== 'production') {
+  process.stderr.write(`Invalid app mode: ${appMode}\n`)
+  process.exit(1)
+}
+
 const repoRoot = process.cwd()
 const fixtureSource = path.join(repoRoot, 'tests', 'fixtures', 'openclaw')
 const runtimeRoot = path.join(repoRoot, '.tmp', 'e2e-openclaw', mode)
@@ -40,7 +47,17 @@ const dataDir = path.join(runtimeRoot, 'data')
 const openCodeDir = path.join(runtimeRoot, '.local', 'share', 'opencode')
 const openCodeDbPath = path.join(openCodeDir, 'opencode-e2e.db')
 const mockBinDir = path.join(repoRoot, 'scripts', 'e2e-openclaw', 'bin')
+const mockOpenClawBin = process.platform === 'win32'
+  ? path.join(mockBinDir, 'openclaw.mjs')
+  : path.join(mockBinDir, 'openclaw')
+const mockClawdbotBin = process.platform === 'win32'
+  ? path.join(mockBinDir, 'clawdbot.mjs')
+  : path.join(mockBinDir, 'clawdbot')
+const mockOpenCodeBin = process.platform === 'win32'
+  ? path.join(mockBinDir, 'opencode.mjs')
+  : path.join(mockBinDir, 'opencode')
 const skillsRoot = path.join(runtimeRoot, 'skills')
+const openCodeProjectPath = path.join(runtimeRoot, 'opencode-project')
 
 function findStandaloneServer(root) {
   const direct = path.join(root, '.next', 'standalone', 'server.js')
@@ -83,11 +100,26 @@ function runBlocking(command, args, options = {}) {
   })
 }
 
+function copyDirectory(source, destination) {
+  fs.mkdirSync(destination, { recursive: true })
+  for (const entry of fs.readdirSync(source, { withFileTypes: true })) {
+    const sourcePath = path.join(source, entry.name)
+    const destinationPath = path.join(destination, entry.name)
+    if (entry.isDirectory()) {
+      copyDirectory(sourcePath, destinationPath)
+    } else if (entry.isFile()) {
+      fs.copyFileSync(sourcePath, destinationPath)
+    } else {
+      throw new Error(`Unsupported fixture entry: ${sourcePath}`)
+    }
+  }
+}
+
 fs.rmSync(runtimeRoot, { recursive: true, force: true })
 fs.mkdirSync(runtimeRoot, { recursive: true })
 fs.mkdirSync(dataDir, { recursive: true })
 fs.mkdirSync(openCodeDir, { recursive: true })
-fs.cpSync(fixtureSource, runtimeRoot, { recursive: true })
+copyDirectory(fixtureSource, runtimeRoot)
 
 const openCodeDb = new Database(openCodeDbPath)
 const now = Date.now()
@@ -136,7 +168,7 @@ openCodeDb.exec(`
 `)
 openCodeDb.prepare(`INSERT OR REPLACE INTO project (id, worktree, vcs, name, icon_url, icon_color, time_created, time_updated, time_initialized, sandboxes, commands) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).run(
   'proj_e2e',
-  '/tmp/opencode-e2e-project',
+  openCodeProjectPath,
   'git',
   null,
   null,
@@ -153,7 +185,7 @@ openCodeDb.prepare(`INSERT OR REPLACE INTO session (id, project_id, parent_id, s
   null,
   'hidden-wolf',
   'OpenCode E2E Session',
-  '/tmp/opencode-e2e-project',
+  openCodeProjectPath,
   now - 10000,
   now - 1000,
   '1.0.0',
@@ -193,9 +225,12 @@ const baseEnv = {
   AUTH_USER: process.env.AUTH_USER || 'admin',
   AUTH_PASS: process.env.AUTH_PASS || 'admin',
   HOSTNAME: '127.0.0.1',
-  PORT: '3005',
+  MC_HOST: '127.0.0.1',
+  PORT: '3100',
   MISSION_CONTROL_TEST_MODE: process.env.MISSION_CONTROL_TEST_MODE || '1',
   MC_DISABLE_RATE_LIMIT: '1',
+  // Keep the E2E database independent of the developer's local coordinator setting.
+  MC_COORDINATOR_AGENT: '',
   MISSION_CONTROL_DATA_DIR: dataDir,
   MISSION_CONTROL_DB_PATH: path.join(dataDir, 'mission-control.db'),
   HOME: runtimeRoot,
@@ -204,15 +239,15 @@ const baseEnv = {
   OPENCLAW_CONFIG_PATH: path.join(runtimeRoot, 'openclaw.json'),
   OPENCLAW_GATEWAY_HOST: gatewayHost,
   OPENCLAW_GATEWAY_PORT: gatewayPort,
-  OPENCLAW_BIN: path.join(mockBinDir, 'openclaw'),
-  OPENCODE_BIN: path.join(mockBinDir, 'opencode'),
-  CLAWDBOT_BIN: path.join(mockBinDir, 'clawdbot'),
+  OPENCLAW_BIN: mockOpenClawBin,
+  OPENCODE_BIN: mockOpenCodeBin,
+  CLAWDBOT_BIN: mockClawdbotBin,
   MC_SKILLS_USER_AGENTS_DIR: path.join(skillsRoot, 'user-agents'),
   MC_SKILLS_USER_CODEX_DIR: path.join(skillsRoot, 'user-codex'),
   MC_SKILLS_PROJECT_AGENTS_DIR: path.join(skillsRoot, 'project-agents'),
   MC_SKILLS_PROJECT_CODEX_DIR: path.join(skillsRoot, 'project-codex'),
   MC_SKILLS_OPENCLAW_DIR: path.join(skillsRoot, 'openclaw'),
-  PATH: `${mockBinDir}:${process.env.PATH || ''}`,
+  PATH: `${mockBinDir}${path.delimiter}${process.env.PATH || ''}`,
   E2E_GATEWAY_EXPECTED: mode === 'gateway' ? '1' : '0',
 }
 
@@ -220,7 +255,7 @@ const children = []
 let app = null
 
 if (mode === 'gateway') {
-  const gw = spawn('node', ['scripts/e2e-openclaw/mock-gateway.mjs'], {
+  const gw = spawn(process.execPath, ['scripts/e2e-openclaw/mock-gateway.mjs'], {
     cwd: repoRoot,
     env: baseEnv,
     stdio: 'inherit',
@@ -242,24 +277,33 @@ if (mode === 'gateway') {
 }
 
 const buildIdPath = path.join(repoRoot, '.next', 'BUILD_ID')
+const nextBin = path.join(repoRoot, 'node_modules', 'next', 'dist', 'bin', 'next')
 
-if (!fs.existsSync(buildIdPath)) {
-  await runBlocking('pnpm', ['build'])
+if (appMode === 'production' && !fs.existsSync(buildIdPath)) {
+  await runBlocking(process.execPath, [path.join(repoRoot, 'scripts', 'run-next-build.mjs')])
 }
 
 const standaloneServerPath = findStandaloneServer(repoRoot)
 
-app = standaloneServerPath && fs.existsSync(standaloneServerPath)
-  ? spawn('node', [standaloneServerPath], {
-      cwd: repoRoot,
-      env: baseEnv,
-      stdio: 'inherit',
-    })
-  : spawn('pnpm', ['start'], {
-      cwd: repoRoot,
-      env: baseEnv,
-      stdio: 'inherit',
-    })
+if (appMode === 'development') {
+  app = spawn(process.execPath, [nextBin, 'dev', '--hostname', '127.0.0.1', '--port', '3100'], {
+    cwd: repoRoot,
+    env: baseEnv,
+    stdio: 'inherit',
+  })
+} else if (standaloneServerPath && fs.existsSync(standaloneServerPath)) {
+  app = spawn(process.execPath, [standaloneServerPath], {
+    cwd: repoRoot,
+    env: baseEnv,
+    stdio: 'inherit',
+  })
+} else {
+  app = spawn(process.execPath, [nextBin, 'start', '--hostname', '127.0.0.1', '--port', '3100'], {
+    cwd: repoRoot,
+    env: baseEnv,
+    stdio: 'inherit',
+  })
+}
 children.push(app)
 
 function shutdown(signal = 'SIGTERM') {

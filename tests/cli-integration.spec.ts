@@ -7,7 +7,7 @@ import { API_KEY_HEADER, createTestAgent, deleteTestAgent, createTestTask, delet
 const execFileAsync = promisify(execFile)
 
 const CLI = path.resolve('scripts/mc-cli.cjs')
-const BASE_URL = process.env.E2E_BASE_URL || 'http://127.0.0.1:3005'
+const BASE_URL = process.env.E2E_BASE_URL || 'http://127.0.0.1:3100'
 const API_KEY = 'test-api-key-e2e-12345'
 
 /** Run mc-cli command via execFile (no shell) and return parsed JSON output */

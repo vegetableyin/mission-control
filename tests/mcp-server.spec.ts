@@ -7,7 +7,7 @@ import { createTestAgent, deleteTestAgent, createTestTask, deleteTestTask } from
 
 const MCP = path.resolve('scripts/mc-mcp-server.cjs')
 const PACKAGE_VERSION = JSON.parse(readFileSync(path.resolve('package.json'), 'utf8')).version
-const BASE_URL = process.env.E2E_BASE_URL || 'http://127.0.0.1:3005'
+const BASE_URL = process.env.E2E_BASE_URL || 'http://127.0.0.1:3100'
 const API_KEY = 'test-api-key-e2e-12345'
 
 /** Send JSON-RPC messages to the MCP server and collect responses */
