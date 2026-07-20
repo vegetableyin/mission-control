@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useMemo, useState } from 'react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { apiFetch } from '@/lib/api-client'
 import { useMissionControl, type Project, type Task } from '@/store'
 import { useNavigateToPanel } from '@/lib/navigation'
@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 
 export function ProjectsOverviewPanel() {
   const t = useTranslations('projectsOverview')
+  const locale = useLocale() === 'zh' ? 'zh-CN' : 'en-US'
   const navigate = useNavigateToPanel()
   const { setActiveProject, setShowProjectManagerModal } = useMissionControl()
   const [projects, setProjects] = useState<Project[]>([])
@@ -45,7 +46,7 @@ export function ProjectsOverviewPanel() {
         {loading ? <p className="p-8 text-center text-sm text-muted-foreground">{t('loading')}</p> : rows.length === 0 ? (
           <div className="p-10 text-center"><p className="text-sm text-muted-foreground">{t('empty')}</p><Button className="mt-4" size="sm" onClick={() => setShowProjectManagerModal(true)}>{t('create')}</Button></div>
         ) : (
-          <div className="overflow-x-auto"><table className="w-full min-w-[760px] text-left text-sm"><thead className="border-b border-border bg-secondary/30 text-xs text-muted-foreground"><tr><th className="px-4 py-3 font-medium">{t('name')}</th><th className="px-4 py-3 font-medium">{t('status')}</th><th className="px-4 py-3 font-medium">{t('lastActivity')}</th><th className="px-4 py-3 text-right font-medium">{t('unfinished')}</th><th className="px-4 py-3 text-right font-medium">{t('failed')}</th><th className="px-4 py-3" /></tr></thead><tbody className="divide-y divide-border/60">{rows.map((project) => <tr key={project.id} className="hover:bg-secondary/25"><td className="px-4 py-3"><div className="font-medium text-foreground">{project.name}</div>{project.description && <div className="mt-0.5 max-w-md truncate text-xs text-muted-foreground">{project.description}</div>}</td><td className="px-4 py-3"><Status project={project} t={t} /></td><td className="px-4 py-3 text-xs text-muted-foreground">{formatShanghaiDateTime(project.lastActivity)}</td><td className="px-4 py-3 text-right tabular-nums">{project.unfinishedTasks}</td><td className={`px-4 py-3 text-right tabular-nums ${project.failedTasks ? 'text-red-400' : 'text-muted-foreground'}`}>{project.failedTasks}</td><td className="px-4 py-3 text-right"><button onClick={() => openTasks(project)} className="text-xs text-primary hover:underline">{t('openTasks')}</button></td></tr>)}</tbody></table></div>
+          <div className="overflow-x-auto"><table className="w-full min-w-[760px] text-left text-sm"><thead className="border-b border-border bg-secondary/30 text-xs text-muted-foreground"><tr><th className="px-4 py-3 font-medium">{t('name')}</th><th className="px-4 py-3 font-medium">{t('status')}</th><th className="px-4 py-3 font-medium">{t('lastActivity')}</th><th className="px-4 py-3 text-right font-medium">{t('unfinished')}</th><th className="px-4 py-3 text-right font-medium">{t('failed')}</th><th className="px-4 py-3" /></tr></thead><tbody className="divide-y divide-border/60">{rows.map((project) => <tr key={project.id} className="hover:bg-secondary/25"><td className="px-4 py-3"><div className="font-medium text-foreground">{project.name}</div>{project.description && <div className="mt-0.5 max-w-md truncate text-xs text-muted-foreground">{project.description}</div>}</td><td className="px-4 py-3"><Status project={project} t={t} /></td><td className="px-4 py-3 text-xs text-muted-foreground">{formatShanghaiDateTime(project.lastActivity, locale)}</td><td className="px-4 py-3 text-right tabular-nums">{project.unfinishedTasks}</td><td className={`px-4 py-3 text-right tabular-nums ${project.failedTasks ? 'text-red-400' : 'text-muted-foreground'}`}>{project.failedTasks}</td><td className="px-4 py-3 text-right"><button onClick={() => openTasks(project)} className="text-xs text-primary hover:underline">{t('openTasks')}</button></td></tr>)}</tbody></table></div>
         )}
       </div>
     </div>
@@ -58,4 +59,3 @@ function Status({ project, t }: { project: ReturnType<typeof buildProjectStatus>
   if (project.status === 'active') return <span className="text-xs text-emerald-400">{t('active')}</span>
   return <span className="text-xs text-muted-foreground">{project.status}</span>
 }
-

@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { apiFetch } from '@/lib/api-client'
 import { useNavigateToPanel } from '@/lib/navigation'
 import { useSmartPoll } from '@/lib/use-smart-poll'
@@ -39,6 +39,7 @@ const storageKey = 'mission-control.attention.dismissed.v1'
 
 export function AttentionCenterPanel() {
   const t = useTranslations('attentionCenter')
+  const locale = useLocale() === 'zh' ? 'zh-CN' : 'en-US'
   const navigate = useNavigateToPanel()
   const [tasks, setTasks] = useState<Task[]>([])
   const [rules, setRules] = useState<AlertRule[]>([])
@@ -92,7 +93,7 @@ export function AttentionCenterPanel() {
       <div className="grid grid-cols-2 gap-3 md:grid-cols-5">{(['approval', 'failed', 'blocked', 'security', 'schedule'] as const).map((kind) => <div key={kind} className="rounded-xl border border-border bg-card p-4"><div className="text-xs text-muted-foreground">{t(`kind.${kind}`)}</div><div className={`mt-2 text-2xl font-semibold tabular-nums ${['failed', 'blocked'].includes(kind) ? 'text-red-400' : kind === 'approval' ? 'text-amber-400' : 'text-foreground'}`}>{visibleItems.filter((item) => item.kind === kind).length}</div></div>)}</div>
       <div className="rounded-xl border border-border bg-card overflow-hidden">
         <div className="border-b border-border px-4 py-3"><h2 className="text-sm font-semibold">{t('openItems')}</h2></div>
-        {loading ? <p className="p-8 text-center text-sm text-muted-foreground">{t('loading')}</p> : visibleItems.length === 0 ? <p className="p-10 text-center text-sm text-muted-foreground">{t('empty')}</p> : <div className="divide-y divide-border/60">{visibleItems.map((item) => <div key={item.id} className="flex flex-col gap-3 p-4 md:flex-row md:items-center"><div className="flex min-w-0 flex-1 items-start gap-3"><span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${tone(item.kind)}`} /><div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><span className="text-xs text-muted-foreground">{t(`kind.${item.kind}`)}</span>{item.timestamp && <span className="text-[11px] text-muted-foreground/70">{formatShanghaiDateTime(item.timestamp)}</span>}</div><div className="mt-1 font-medium text-foreground">{item.title}</div><div className="mt-1 text-xs text-muted-foreground">{item.detail}</div></div></div><div className="flex shrink-0 flex-wrap gap-2 pl-5 md:pl-0"><Button size="xs" variant="outline" onClick={() => navigate(item.panel)}>{t('viewDetails')}</Button><Button size="xs" variant="ghost" onClick={() => updateDismissed(item.id, 'handled')}>{t('markHandled')}</Button><Button size="xs" variant="ghost" onClick={() => updateDismissed(item.id, 'ignored')}>{t('ignore')}</Button></div></div>)}</div>}
+        {loading ? <p className="p-8 text-center text-sm text-muted-foreground">{t('loading')}</p> : visibleItems.length === 0 ? <p className="p-10 text-center text-sm text-muted-foreground">{t('empty')}</p> : <div className="divide-y divide-border/60">{visibleItems.map((item) => <div key={item.id} className="flex flex-col gap-3 p-4 md:flex-row md:items-center"><div className="flex min-w-0 flex-1 items-start gap-3"><span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${tone(item.kind)}`} /><div className="min-w-0"><div className="flex flex-wrap items-center gap-2"><span className="text-xs text-muted-foreground">{t(`kind.${item.kind}`)}</span>{item.timestamp && <span className="text-[11px] text-muted-foreground/70">{formatShanghaiDateTime(item.timestamp, locale)}</span>}</div><div className="mt-1 font-medium text-foreground">{item.title}</div><div className="mt-1 text-xs text-muted-foreground">{item.detail}</div></div></div><div className="flex shrink-0 flex-wrap gap-2 pl-5 md:pl-0"><Button size="xs" variant="outline" onClick={() => navigate(item.panel)}>{t('viewDetails')}</Button><Button size="xs" variant="ghost" onClick={() => updateDismissed(item.id, 'handled')}>{t('markHandled')}</Button><Button size="xs" variant="ghost" onClick={() => updateDismissed(item.id, 'ignored')}>{t('ignore')}</Button></div></div>)}</div>}
       </div>
       {dismissedItems.length > 0 && <details className="rounded-xl border border-border bg-card"><summary className="cursor-pointer px-4 py-3 text-sm text-muted-foreground">{t('dismissed', { count: dismissedItems.length })}</summary><div className="divide-y divide-border/60 border-t border-border">{dismissedItems.map((item) => <div key={item.id} className="flex items-center justify-between gap-3 px-4 py-3 text-sm"><span className="truncate text-muted-foreground">{item.title}</span><button onClick={() => updateDismissed(item.id, null)} className="shrink-0 text-xs text-primary hover:underline">{t('restore')}</button></div>)}</div></details>}
       <p className="text-xs text-muted-foreground">{t('localStateNote')}</p>

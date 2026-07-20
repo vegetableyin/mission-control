@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useMemo, useState } from 'react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { apiFetch } from '@/lib/api-client'
 import { useSmartPoll } from '@/lib/use-smart-poll'
 import { formatShanghaiDateTime } from '@/lib/command-center'
@@ -19,6 +19,7 @@ interface RuntimeStatus {
 
 export function CodexStatusPanel() {
   const t = useTranslations('codexStatus')
+  const locale = useLocale() === 'zh' ? 'zh-CN' : 'en-US'
   const [runtime, setRuntime] = useState<RuntimeStatus | null>(null)
   const [sessions, setSessions] = useState<Session[]>([])
   const [loading, setLoading] = useState(true)
@@ -58,7 +59,7 @@ export function CodexStatusPanel() {
       <div className="rounded-xl border border-border bg-card overflow-hidden">
         <div className="border-b border-border px-4 py-3"><h2 className="text-sm font-semibold">{t('sessions')}</h2></div>
         {loading ? <p className="p-8 text-center text-sm text-muted-foreground">{t('checking')}</p> : ordered.length === 0 ? <p className="p-10 text-center text-sm text-muted-foreground">{t('empty')}</p> : (
-          <div className="overflow-x-auto"><table className="w-full min-w-[820px] text-left text-xs"><thead className="bg-secondary/30 text-muted-foreground"><tr><th className="px-4 py-3 font-medium">{t('session')}</th><th className="px-4 py-3 font-medium">{t('projectDirectory')}</th><th className="px-4 py-3 font-medium">{t('model')}</th><th className="px-4 py-3 font-medium">{t('tokens')}</th><th className="px-4 py-3 font-medium">{t('lastActivity')}</th><th className="px-4 py-3 font-medium">{t('state')}</th></tr></thead><tbody className="divide-y divide-border/60">{ordered.map((session) => <tr key={session.id}><td className="px-4 py-3 font-medium text-foreground">{session.label || session.key || session.id}</td><td className="max-w-[320px] truncate px-4 py-3 font-mono text-[11px] text-muted-foreground">{session.key || '—'}</td><td className="px-4 py-3">{session.model || '—'}</td><td className="px-4 py-3 tabular-nums">{session.tokens || '—'}</td><td className="px-4 py-3 text-muted-foreground">{formatShanghaiDateTime(session.lastActivity)}</td><td className="px-4 py-3"><span className={session.active ? 'text-emerald-400' : 'text-muted-foreground'}>{session.active ? t('status.running') : t('status.idle')}</span></td></tr>)}</tbody></table></div>
+          <div className="overflow-x-auto"><table className="w-full min-w-[820px] text-left text-xs"><thead className="bg-secondary/30 text-muted-foreground"><tr><th className="px-4 py-3 font-medium">{t('session')}</th><th className="px-4 py-3 font-medium">{t('projectDirectory')}</th><th className="px-4 py-3 font-medium">{t('model')}</th><th className="px-4 py-3 font-medium">{t('tokens')}</th><th className="px-4 py-3 font-medium">{t('lastActivity')}</th><th className="px-4 py-3 font-medium">{t('state')}</th></tr></thead><tbody className="divide-y divide-border/60">{ordered.map((session) => <tr key={session.id}><td className="px-4 py-3 font-medium text-foreground">{session.label || session.key || session.id}</td><td className="max-w-[320px] truncate px-4 py-3 font-mono text-[11px] text-muted-foreground">{session.key || '—'}</td><td className="px-4 py-3">{session.model || '—'}</td><td className="px-4 py-3 tabular-nums">{session.tokens || '—'}</td><td className="px-4 py-3 text-muted-foreground">{formatShanghaiDateTime(session.lastActivity, locale)}</td><td className="px-4 py-3"><span className={session.active ? 'text-emerald-400' : 'text-muted-foreground'}>{session.active ? t('status.running') : t('status.idle')}</span></td></tr>)}</tbody></table></div>
         )}
       </div>
       <p className="text-xs text-muted-foreground">{t('privacyNote')}</p>

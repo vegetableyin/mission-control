@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useMemo, useState } from 'react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { apiFetch } from '@/lib/api-client'
 import { useNavigateToPanel } from '@/lib/navigation'
 import { useSmartPoll } from '@/lib/use-smart-poll'
@@ -11,7 +11,6 @@ import {
   formatShanghaiDateTime,
   isBlockedTask,
   isTaskToday,
-  needsOperatorAttention,
 } from '@/lib/command-center'
 
 interface AlertRule {
@@ -56,6 +55,7 @@ function Section({ title, action, children }: { title: string; action?: React.Re
 
 export function EssentialDashboard() {
   const t = useTranslations('essentialDashboard')
+  const locale = useLocale() === 'zh' ? 'zh-CN' : 'en-US'
   const navigate = useNavigateToPanel()
   const [data, setData] = useState<DashboardState>(emptyState)
   const [loading, setLoading] = useState(true)
@@ -157,7 +157,7 @@ export function EssentialDashboard() {
                     <tr key={project.id} className="group">
                       <td className="py-3 font-medium text-foreground">{project.name}</td>
                       <td className="py-3"><span className={project.blocked ? 'text-red-400' : project.stale ? 'text-amber-400' : 'text-emerald-400'}>{project.blocked ? t('status.blocked') : project.stale ? t('status.stale') : t(`status.${project.status === 'active' ? 'active' : 'inactive'}`)}</span></td>
-                      <td className="py-3 text-muted-foreground">{formatShanghaiDateTime(project.lastActivity)}</td>
+                      <td className="py-3 text-muted-foreground">{formatShanghaiDateTime(project.lastActivity, locale)}</td>
                       <td className="py-3 text-right tabular-nums">{project.unfinishedTasks}</td>
                       <td className={`py-3 text-right tabular-nums ${project.failedTasks ? 'text-red-400' : 'text-muted-foreground'}`}>{project.failedTasks}</td>
                       <td className="py-3 text-right"><button onClick={() => navigate('tasks')} className="text-primary opacity-80 hover:underline group-hover:opacity-100">{t('projects.next')}</button></td>
@@ -173,15 +173,15 @@ export function EssentialDashboard() {
       <div className="grid gap-5 lg:grid-cols-3">
         <Section title={t('codex.title')} action={<button onClick={() => navigate('codex')} className="text-xs text-primary hover:underline">{t('viewAll')}</button>}>
           <div className="grid grid-cols-2 gap-3 text-sm"><Stat label={t('codex.running')} value={view.codexSessions.filter((session) => session.active).length} /><Stat label={t('codex.idle')} value={view.codexSessions.filter((session) => !session.active).length} /></div>
-          <div className="mt-4 space-y-2">{codexRecentCompleted.length ? codexRecentCompleted.map((session) => <Row key={session.id} title={session.label || session.key || session.id} detail={formatShanghaiDateTime(session.lastActivity)} />) : <Empty text={t('codex.empty')} />}</div>
+          <div className="mt-4 space-y-2">{codexRecentCompleted.length ? codexRecentCompleted.map((session) => <Row key={session.id} title={session.label || session.key || session.id} detail={formatShanghaiDateTime(session.lastActivity, locale)} />) : <Empty text={t('codex.empty')} />}</div>
         </Section>
 
         <Section title={t('schedules.title')} action={<button onClick={() => navigate('cron')} className="text-xs text-primary hover:underline">{t('viewAll')}</button>}>
-          <div className="grid grid-cols-2 gap-3 text-sm"><Stat label={t('schedules.ranToday')} value={jobsRunToday} /><Stat label={t('schedules.failedToday')} value={jobsFailedToday} danger={jobsFailedToday > 0} /><Stat label={t('schedules.nextRun')} value={nextJob ? formatShanghaiDateTime(nextJob.nextRun) : '—'} /><Stat label={t('schedules.paused')} value={pausedJobs} /></div>
+          <div className="grid grid-cols-2 gap-3 text-sm"><Stat label={t('schedules.ranToday')} value={jobsRunToday} /><Stat label={t('schedules.failedToday')} value={jobsFailedToday} danger={jobsFailedToday > 0} /><Stat label={t('schedules.nextRun')} value={nextJob ? formatShanghaiDateTime(nextJob.nextRun, locale) : '—'} /><Stat label={t('schedules.paused')} value={pausedJobs} /></div>
         </Section>
 
         <Section title={t('activity.title')} action={<button onClick={() => navigate('activity')} className="text-xs text-primary hover:underline">{t('viewAll')}</button>}>
-          <div className="space-y-2">{data.activities.length ? data.activities.slice(0, 6).map((activity) => <Row key={activity.id} title={activity.description} detail={`${activity.actor} · ${formatShanghaiDateTime(activity.created_at)}`} />) : <Empty text={t('activity.empty')} />}</div>
+          <div className="space-y-2">{data.activities.length ? data.activities.slice(0, 6).map((activity) => <Row key={activity.id} title={activity.description} detail={`${activity.actor} · ${formatShanghaiDateTime(activity.created_at, locale)}`} />) : <Empty text={t('activity.empty')} />}</div>
         </Section>
       </div>
     </div>
@@ -205,4 +205,3 @@ function Row({ title, detail }: { title: string; detail: string }) {
 function Empty({ text }: { text: string }) {
   return <p className="py-4 text-center text-xs text-muted-foreground">{text}</p>
 }
-
