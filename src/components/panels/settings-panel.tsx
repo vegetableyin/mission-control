@@ -13,6 +13,7 @@ import { clearOnboardingDismissedThisSession, clearOnboardingReplayFromStart } f
 import { resolveCoordinatorDeliveryTarget, type CoordinatorAgentRecord } from '@/lib/coordinator-routing'
 import type { GatewaySession } from '@/lib/sessions'
 import { apiFetch, ApiError } from '@/lib/api-client'
+import { ESSENTIAL_PANEL_IDS } from '@/lib/interface-mode'
 
 interface Setting {
   key: string
@@ -1011,6 +1012,7 @@ function InterfaceModeSelector() {
   const { interfaceMode, setInterfaceMode } = useMissionControl()
   const [saving, setSaving] = useState(false)
   const navigateToPanel = useNavigateToPanel()
+  const t = useTranslations('settings.interfaceMode')
 
   const handleChange = async (mode: 'essential' | 'full') => {
     setInterfaceMode(mode)
@@ -1034,7 +1036,7 @@ function InterfaceModeSelector() {
     }
     // If switching to essential and on a hidden panel, redirect
     if (reachedServer && mode === 'essential') {
-      const essentialIds = new Set(['overview', 'agents', 'tasks', 'chat', 'activity', 'logs', 'settings'])
+      const essentialIds = new Set<string>(ESSENTIAL_PANEL_IDS)
       const store = useMissionControl.getState()
       if (!essentialIds.has(store.activeTab)) {
         navigateToPanel('overview')
@@ -1045,14 +1047,14 @@ function InterfaceModeSelector() {
 
   return (
     <div className="bg-card border border-border rounded-lg p-4">
-      <h3 className="text-sm font-medium text-foreground mb-1">Interface Mode</h3>
+      <h3 className="text-sm font-medium text-foreground mb-1">{t('title')}</h3>
       <p className="text-xs text-muted-foreground mb-3">
-        Controls how many panels appear in the sidebar.
+        {t('description')}
       </p>
       <div className="space-y-2">
         {([
-          { value: 'essential' as const, label: 'Essential', desc: 'Focused view with core panels only — Overview, Agents, Tasks, Chat, Activity, Logs, Settings.' },
-          { value: 'full' as const, label: 'Full', desc: 'All panels and advanced features including Memory, Cron, Webhooks, Alerts, Audit, and more.' },
+          { value: 'essential' as const, label: t('essentialLabel'), desc: t('essentialDescription') },
+          { value: 'full' as const, label: t('fullLabel'), desc: t('fullDescription') },
         ]).map(option => (
           <button
             key={option.value}
@@ -1078,7 +1080,7 @@ function InterfaceModeSelector() {
           </button>
         ))}
       </div>
-      <p className="text-2xs text-muted-foreground/60 mt-2">You can also switch from the sidebar footer.</p>
+      <p className="text-2xs text-muted-foreground/60 mt-2">{t('footerHint')}</p>
     </div>
   )
 }

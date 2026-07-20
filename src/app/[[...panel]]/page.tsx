@@ -6,6 +6,10 @@ import { NavRail } from '@/components/layout/nav-rail'
 import { HeaderBar } from '@/components/layout/header-bar'
 import { LiveFeed } from '@/components/layout/live-feed'
 import { Dashboard } from '@/components/dashboard/dashboard'
+import { EssentialDashboard } from '@/components/dashboard/essential-dashboard'
+import { ProjectsOverviewPanel } from '@/components/panels/projects-overview-panel'
+import { CodexStatusPanel } from '@/components/panels/codex-status-panel'
+import { AttentionCenterPanel } from '@/components/panels/attention-center-panel'
 import { LogViewerPanel } from '@/components/panels/log-viewer-panel'
 import { CronManagementPanel } from '@/components/panels/cron-management-panel'
 import { MemoryBrowserPanel } from '@/components/panels/memory-browser-panel'
@@ -60,6 +64,7 @@ import { clearOnboardingDismissedThisSession, clearOnboardingReplayFromStart, ge
 import { Button } from '@/components/ui/button'
 import { useMissionControl, type CurrentUser } from '@/store'
 import { apiFetch, ApiError } from '@/lib/api-client'
+import { isEssentialPanel } from '@/lib/interface-mode'
 
 interface GatewaySummary {
   id: number
@@ -516,10 +521,6 @@ export default function Home() {
   )
 }
 
-const ESSENTIAL_PANELS = new Set([
-  'overview', 'agents', 'tasks', 'chat', 'activity', 'logs', 'settings',
-])
-
 function ContentRouter({ tab }: { tab: string }) {
   const tp = useTranslations('page')
   const { dashboardMode, interfaceMode, setInterfaceMode } = useMissionControl()
@@ -528,7 +529,7 @@ function ContentRouter({ tab }: { tab: string }) {
   const panelName = tab.replace(/-/g, ' ')
 
   // Guard: show nudge for non-essential panels in essential mode
-  if (interfaceMode === 'essential' && !ESSENTIAL_PANELS.has(tab)) {
+  if (interfaceMode === 'essential' && !isEssentialPanel(tab)) {
     return (
       <div className="flex flex-col items-center justify-center py-24 text-center gap-4">
         <p className="text-sm text-muted-foreground">
@@ -561,16 +562,22 @@ function ContentRouter({ tab }: { tab: string }) {
     case 'overview':
       return (
         <>
-          <Dashboard />
-          {!isLocal && (
+          {interfaceMode === 'essential' ? <EssentialDashboard /> : <Dashboard />}
+          {interfaceMode === 'full' && !isLocal && (
             <div className="mt-4 mx-4 mb-4 rounded-lg border border-border bg-card overflow-hidden">
               <AgentCommsPanel />
             </div>
           )}
         </>
       )
+    case 'projects':
+      return <ProjectsOverviewPanel />
     case 'tasks':
       return <TaskBoardPanel />
+    case 'codex':
+      return <CodexStatusPanel />
+    case 'attention':
+      return <AttentionCenterPanel />
     case 'agents':
       return (
         <>

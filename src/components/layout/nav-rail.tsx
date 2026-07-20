@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { APP_VERSION } from '@/lib/version'
 import { getPluginNavItems } from '@/lib/plugins'
 import { apiFetch } from '@/lib/api-client'
+import { ESSENTIAL_PANEL_IDS } from '@/lib/interface-mode'
 
 interface NavItem {
   id: string
@@ -31,9 +32,12 @@ const navGroups: NavGroup[] = [
     id: 'core',
     items: [
       { id: 'overview', label: 'Overview', icon: <OverviewIcon />, priority: true, essential: true },
-      { id: 'agents', label: 'Agents', icon: <AgentsIcon />, priority: true, essential: true },
+      { id: 'projects', label: 'Projects', icon: <OrganizationsIcon />, priority: true, essential: true },
       { id: 'tasks', label: 'Tasks', icon: <TasksIcon />, priority: true, essential: true },
-      { id: 'chat', label: 'Chat', icon: <ChatIcon />, priority: false, essential: true },
+      { id: 'codex', label: 'Codex', icon: <SessionsIcon />, priority: true, essential: true },
+      { id: 'attention', label: 'Attention', icon: <ApprovalsIcon />, priority: false, essential: true },
+      { id: 'agents', label: 'Agents', icon: <AgentsIcon />, priority: false },
+      { id: 'chat', label: 'Chat', icon: <ChatIcon />, priority: false },
       { id: 'channels', label: 'Channels', icon: <ChannelsIcon />, priority: false },
       { id: 'skills', label: 'Skills', icon: <SkillsIcon />, priority: false },
       { id: 'memory', label: 'Memory', icon: <MemoryIcon />, priority: false },
@@ -43,8 +47,8 @@ const navGroups: NavGroup[] = [
     id: 'observe',
     label: 'OBSERVE',
     items: [
-      { id: 'activity', label: 'Activity', icon: <ActivityIcon />, priority: true, essential: true },
-      { id: 'logs', label: 'Logs', icon: <LogsIcon />, priority: false, essential: true },
+      { id: 'activity', label: 'Activity', icon: <ActivityIcon />, priority: false, essential: true },
+      { id: 'logs', label: 'Logs', icon: <LogsIcon />, priority: false },
       { id: 'cost-tracker', label: 'Cost Tracker', icon: <TokensIcon />, priority: false },
       { id: 'nodes', label: 'Nodes', icon: <NodesIcon />, priority: false },
       { id: 'exec-approvals', label: 'Approvals', icon: <ApprovalsIcon />, priority: false },
@@ -56,7 +60,7 @@ const navGroups: NavGroup[] = [
     id: 'automate',
     label: 'AUTOMATE',
     items: [
-      { id: 'cron', label: 'Cron', icon: <CronIcon />, priority: false },
+      { id: 'cron', label: 'Schedules', icon: <CronIcon />, priority: false, essential: true },
       { id: 'webhooks', label: 'Webhooks', icon: <WebhookIcon />, priority: false },
       { id: 'alerts', label: 'Alerts', icon: <AlertIcon />, priority: false },
       { id: 'github', label: 'GitHub', icon: <GitHubIcon />, priority: false },
@@ -86,8 +90,11 @@ const navGroups: NavGroup[] = [
 // Map nav item IDs to translation keys in the 'nav' namespace
 const navItemTranslationKeys: Record<string, string> = {
   overview: 'overview',
+  projects: 'projects',
   agents: 'agents',
   tasks: 'tasks',
+  codex: 'codex',
+  attention: 'attention',
   chat: 'chat',
   channels: 'channels',
   skills: 'skills',
@@ -945,7 +952,7 @@ function ContextSwitcher({ currentUser, isAdmin, isLocal, isConnected, tenants, 
                   onClick={async () => {
                     if (interfaceMode === 'essential') return
                     setInterfaceMode('essential')
-                    const essentialIds = new Set(['overview', 'agents', 'tasks', 'chat', 'activity', 'logs', 'settings'])
+                    const essentialIds = new Set<string>(ESSENTIAL_PANEL_IDS)
                     if (!essentialIds.has(activeTab)) navigateToPanel('overview')
                     try { await apiFetch('/api/settings', { method: 'PUT', body: JSON.stringify({ settings: { 'general.interface_mode': 'essential' } }) }) } catch {}
                   }}
