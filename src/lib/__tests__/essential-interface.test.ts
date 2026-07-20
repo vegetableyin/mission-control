@@ -36,4 +36,21 @@ describe('essential interface baseline', () => {
     expect(pkg.scripts.start).not.toContain('${PORT:-')
     expect(wrapper).toContain("'127.0.0.1'")
   })
+
+  it('keeps hidden routes reachable and persists mode changes through settings', () => {
+    const router = readFileSync(join(process.cwd(), 'src/app/[[...panel]]/page.tsx'), 'utf8')
+    const settings = readFileSync(join(process.cwd(), 'src/components/panels/settings-panel.tsx'), 'utf8')
+    expect(router).toContain("interfaceMode === 'essential' && !isEssentialPanel(tab)")
+    expect(router).toContain("tp('availableInFullMode'")
+    expect(settings).toContain("'general.interface_mode': mode")
+    expect(settings).toContain('ESSENTIAL_PANEL_IDS')
+  })
+
+  it('renders explicit dashboard empty states instead of fabricated data', () => {
+    const dashboard = readFileSync(join(process.cwd(), 'src/components/dashboard/essential-dashboard.tsx'), 'utf8')
+    expect(dashboard).toContain("t('attention.empty')")
+    expect(dashboard).toContain("t('projects.empty')")
+    expect(dashboard).toContain("t('codex.empty')")
+    expect(dashboard).toContain("t('activity.empty')")
+  })
 })
