@@ -4,8 +4,10 @@ import path from 'node:path'
 const root = path.resolve('.next/standalone')
 const requiredFiles = [
   'server.js',
+  '.next/static',
   'openapi.json',
   'ops/templates/openclaw-gateway@.service',
+  'public/mc-logo.png',
   'src/lib/schema.sql',
 ]
 const allowedRoots = new Set([

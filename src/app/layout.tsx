@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter, JetBrains_Mono } from 'next/font/google'
 import { headers } from 'next/headers'
+import { connection } from 'next/server'
 import { ThemeProvider } from 'next-themes'
 import { NextIntlClientProvider } from 'next-intl'
 import { getLocale, getMessages } from 'next-intl/server'
@@ -89,6 +90,9 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  // Nonce-based CSP requires per-request rendering so Next.js can apply the
+  // proxy-generated nonce to its framework scripts in production output.
+  await connection()
   const nonce = (await headers()).get('x-nonce') || undefined
   const locale = await getLocale()
   const messages = await getMessages()

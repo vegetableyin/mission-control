@@ -1,6 +1,7 @@
-import { access, mkdir, readdir, rm } from 'node:fs/promises'
+import { access, cp, mkdir, readdir, rm } from 'node:fs/promises'
 import path from 'node:path'
 
+const repoRoot = path.resolve('.')
 const root = path.resolve('.next/standalone')
 const sourceRoot = path.join(root, 'src')
 const schemaPath = path.join(sourceRoot, 'lib', 'schema.sql')
@@ -44,5 +45,17 @@ for (const entry of await readdir(path.join(root, 'ops', 'templates'))) {
   }
 }
 await mkdir(path.dirname(schemaPath), { recursive: true })
+
+// Next.js standalone output intentionally excludes browser assets. Copy them
+// beside server.js so the production launcher serves JavaScript, styles,
+// fonts, and public files instead of falling through to the application route.
+await cp(path.join(repoRoot, '.next', 'static'), path.join(root, '.next', 'static'), {
+  recursive: true,
+  force: true,
+})
+await cp(path.join(repoRoot, 'public'), path.join(root, 'public'), {
+  recursive: true,
+  force: true,
+})
 
 console.log('Prepared standalone artifact with release-only repository files')
