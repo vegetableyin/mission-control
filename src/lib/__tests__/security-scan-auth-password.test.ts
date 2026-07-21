@@ -18,7 +18,7 @@ describe('security scan admin password resolution', () => {
     // The first Windows OS scan launches real native security probes. Warm
     // their cache under an explicit integration timeout.
     runSecurityScan()
-  }, 15_000)
+  }, 60_000)
 
   afterEach(() => {
     restore('AUTH_PASS', originalAuthPass)

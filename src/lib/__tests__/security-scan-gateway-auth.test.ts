@@ -38,7 +38,7 @@ describe('scanOpenClaw — gateway_auth credential handling', () => {
     // Windows security probes are intentionally real and can exceed Vitest's
     // per-test default on their uncached first run.
     runSecurityScan()
-  }, 15_000)
+  }, 60_000)
 
   beforeEach(() => {
     writeOpenClawConfig({})
