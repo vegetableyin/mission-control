@@ -1,11 +1,13 @@
 'use client'
 
 import { useTheme } from 'next-themes'
+import { useTranslations } from 'next-intl'
 import { useEffect, useState, useRef } from 'react'
 import { THEMES } from '@/lib/themes'
 import { Button } from '@/components/ui/button'
 
 export function ThemeSelector() {
+  const t = useTranslations('themeSelector')
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
   const [open, setOpen] = useState(false)
@@ -47,7 +49,7 @@ export function ThemeSelector() {
         onClick={() => setOpen(!open)}
         variant="ghost"
         size="icon-sm"
-        title="Change theme"
+        title={t('changeTheme')}
       >
         <PaletteIcon />
       </Button>
@@ -57,7 +59,7 @@ export function ThemeSelector() {
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
           <div className="absolute right-0 top-full mt-1 w-52 rounded-lg bg-card border border-border shadow-lg z-50 py-1 overflow-hidden">
             <div className="px-3 py-1.5">
-              <span className="text-2xs font-semibold text-muted-foreground uppercase tracking-wider">Dark</span>
+              <span className="text-2xs font-semibold text-muted-foreground uppercase tracking-wider">{t('dark')}</span>
             </div>
             {darkThemes.map(t => (
               <ThemeRow
@@ -69,7 +71,7 @@ export function ThemeSelector() {
             ))}
             <div className="my-1 border-t border-border" />
             <div className="px-3 py-1.5">
-              <span className="text-2xs font-semibold text-muted-foreground uppercase tracking-wider">Light</span>
+              <span className="text-2xs font-semibold text-muted-foreground uppercase tracking-wider">{t('light')}</span>
             </div>
             {lightThemes.map(t => (
               <ThemeRow

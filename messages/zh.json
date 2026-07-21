@@ -266,6 +266,7 @@
     "stateIntegrity": "OpenClaw 状态完整性警告",
     "securityWarning": "OpenClaw 安全警告",
     "doctorWarnings": "OpenClaw 诊断警告",
+    "commandTimedOut": "本地 OpenClaw 诊断命令超时，可打开详情查看完整的本地错误。",
     "runningFixes": "正在运行 OpenClaw 诊断修复...",
     "cleaningSessionStores": "正在清理会话存储...",
     "archivingOrphanTranscripts": "正在归档孤立的转录记录...",
@@ -2220,6 +2221,11 @@
     "tabStatus": "状态",
     "unhealthy": "不健康",
     "unreachable": "不可达"
+  },
+  "themeSelector": {
+    "changeTheme": "切换主题",
+    "dark": "深色",
+    "light": "浅色"
   },
   "essentialDashboard": {
     "title": "个人驾驶舱",

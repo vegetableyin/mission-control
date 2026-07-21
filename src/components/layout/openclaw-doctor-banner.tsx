@@ -130,7 +130,11 @@ export function OpenClawDoctorBanner() {
           secondary: 'text-amber-300 border-amber-500/20 hover:border-amber-500/40 hover:text-amber-200',
         }
 
-  const visibleIssues = doctor.issues.slice(0, 3)
+  const displayDoctorText = (value: string) =>
+    /command timed out|(?:[a-z]:\\users\\|\/users\/|\/home\/)/i.test(value)
+      ? t('commandTimedOut')
+      : value
+  const visibleIssues = [...new Set(doctor.issues.slice(0, 3).map(displayDoctorText))]
   const extraCount = Math.max(doctor.issues.length - visibleIssues.length, 0)
   const busy = state === 'fixing'
   const headline =
@@ -146,13 +150,13 @@ export function OpenClawDoctorBanner() {
 
   return (
     <div className="mx-4 mt-3 mb-0">
-      <div className={`flex items-start gap-3 px-4 py-3 rounded-lg border text-sm ${tone.frame}`}>
+      <div className={`flex flex-col items-start gap-3 px-4 py-3 rounded-lg border text-sm sm:flex-row ${tone.frame}`}>
         <span className={`mt-1 h-1.5 w-1.5 shrink-0 rounded-full ${tone.dot}`} />
         <div className="min-w-0 flex-1">
           <p className="text-xs">
             <span className={`font-medium ${tone.primary}`}>{headline}</span>
             {' — '}
-            {state === 'error' ? errorMsg || doctor.summary : doctor.summary}
+            {displayDoctorText(state === 'error' ? errorMsg || doctor.summary : doctor.summary)}
           </p>
           {visibleIssues.length > 0 && (
             <div className="mt-2 space-y-1">
@@ -173,7 +177,7 @@ export function OpenClawDoctorBanner() {
             <p className="mt-2 text-2xs opacity-85">{fixProgress}</p>
           )}
         </div>
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex w-full shrink-0 flex-wrap items-center gap-2 sm:w-auto sm:justify-end">
           {doctor.canFix && state !== 'success' && (
             <button
               onClick={handleFix}

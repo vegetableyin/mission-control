@@ -266,6 +266,7 @@
     "stateIntegrity": "OpenClaw state integrity warning",
     "securityWarning": "OpenClaw security warning",
     "doctorWarnings": "OpenClaw doctor warnings",
+    "commandTimedOut": "The local OpenClaw diagnostic command timed out. Open details to inspect the full local error.",
     "runningFixes": "Running OpenClaw doctor fixes...",
     "cleaningSessionStores": "Cleaning session stores...",
     "archivingOrphanTranscripts": "Archiving orphan transcripts...",
@@ -2220,6 +2221,11 @@
     "restarting": "Restarting...",
     "diagnosing": "Diagnosing...",
     "notInstalled": "Not installed"
+  },
+  "themeSelector": {
+    "changeTheme": "Change theme",
+    "dark": "Dark",
+    "light": "Light"
   },
   "essentialDashboard": {
     "title": "Personal Command Center",
