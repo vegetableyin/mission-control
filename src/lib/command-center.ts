@@ -3,6 +3,12 @@ import type { Project, Task } from '@/store'
 export const SHANGHAI_TIME_ZONE = 'Asia/Shanghai'
 export const STALE_PROJECT_DAYS = 14
 
+export type OperatorAttentionKind = 'blocked' | 'failed' | 'waiting' | 'alert'
+
+export function operatorAttentionSeverity(kind: OperatorAttentionKind): number {
+  return { blocked: 4, failed: 3, waiting: 2, alert: 1 }[kind]
+}
+
 export type ProjectWithActivity = Project & {
   created_at?: number
   updated_at?: number
@@ -89,4 +95,3 @@ export function buildProjectStatus(
     return (b.lastActivity ?? 0) - (a.lastActivity ?? 0)
   })
 }
-

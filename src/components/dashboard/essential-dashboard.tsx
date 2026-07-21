@@ -11,6 +11,7 @@ import {
   formatShanghaiDateTime,
   isBlockedTask,
   isTaskToday,
+  operatorAttentionSeverity,
 } from '@/lib/command-center'
 
 interface AlertRule {
@@ -94,11 +95,11 @@ export function EssentialDashboard() {
     const activeAlerts = data.rules.filter((rule) => rule.enabled && rule.trigger_count > 0)
     const codexSessions = data.sessions.filter((session) => session.kind.toLowerCase().includes('codex'))
     const attention = [
-      ...waitingTasks.map((task) => ({ id: `waiting-${task.id}`, tone: 'warn' as const, label: t('waitingTask'), title: task.title, panel: 'tasks' })),
-      ...failedTasks.map((task) => ({ id: `failed-${task.id}`, tone: 'danger' as const, label: t('failedTask'), title: task.title, panel: 'tasks' })),
-      ...blockedTasks.map((task) => ({ id: `blocked-${task.id}`, tone: 'danger' as const, label: t('blockedTask'), title: task.title, panel: 'tasks' })),
-      ...activeAlerts.map((rule) => ({ id: `alert-${rule.id}`, tone: 'warn' as const, label: t('alert'), title: rule.name, panel: 'alerts' })),
-    ].slice(0, 8)
+      ...waitingTasks.map((task) => ({ id: `waiting-${task.id}`, kind: 'waiting' as const, tone: 'warn' as const, label: t('waitingTask'), title: task.title, panel: 'tasks' })),
+      ...failedTasks.map((task) => ({ id: `failed-${task.id}`, kind: 'failed' as const, tone: 'danger' as const, label: t('failedTask'), title: task.title, panel: 'tasks' })),
+      ...blockedTasks.map((task) => ({ id: `blocked-${task.id}`, kind: 'blocked' as const, tone: 'danger' as const, label: t('blockedTask'), title: task.title, panel: 'tasks' })),
+      ...activeAlerts.map((rule) => ({ id: `alert-${rule.id}`, kind: 'alert' as const, tone: 'warn' as const, label: t('alert'), title: rule.name, panel: 'alerts' })),
+    ].sort((a, b) => operatorAttentionSeverity(b.kind) - operatorAttentionSeverity(a.kind)).slice(0, 8)
     return { projects, activeProjects, todayTasks, failedTasks, blockedTasks, waitingTasks, activeAlerts, codexSessions, attention }
   }, [data, t])
 

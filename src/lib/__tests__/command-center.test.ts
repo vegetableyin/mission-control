@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildProjectStatus, isBlockedTask, isTaskToday, shanghaiDayKey } from '@/lib/command-center'
+import { buildProjectStatus, isBlockedTask, isTaskToday, operatorAttentionSeverity, shanghaiDayKey } from '@/lib/command-center'
 import type { Project, Task } from '@/store'
 
 function task(overrides: Partial<Task>): Task {
@@ -42,5 +42,10 @@ describe('command center selectors', () => {
     expect(shanghaiDayKey(now)).toBe('2026-07-21')
     expect(isTaskToday(task({ due_date: due }), now)).toBe(true)
   })
-})
 
+  it('orders operator attention by blocking severity', () => {
+    const kinds = ['alert', 'waiting', 'failed', 'blocked'] as const
+    expect([...kinds].sort((a, b) => operatorAttentionSeverity(b) - operatorAttentionSeverity(a)))
+      .toEqual(['blocked', 'failed', 'waiting', 'alert'])
+  })
+})
