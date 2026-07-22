@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import type { DashboardData } from '../widget-primitives'
 
 /** Simple SVG sparkline from an array of numbers */
@@ -53,6 +54,7 @@ interface FleetRow {
 }
 
 export function FleetStatusWidget({ data }: { data: DashboardData }) {
+  const t = useTranslations('fullDashboard')
   const {
     isLocal,
     claudeActive,
@@ -107,7 +109,7 @@ export function FleetStatusWidget({ data }: { data: DashboardData }) {
       ]
     : [
         {
-          name: 'Gateway',
+          name: t('gateway'),
           active: onlineAgents,
           total: dbStats?.agents.total ?? agents.length,
           sessions: sessions,
@@ -121,7 +123,7 @@ export function FleetStatusWidget({ data }: { data: DashboardData }) {
   // Add gateway row for local mode too if connected
   if (isLocal && connection.isConnected) {
     rows.push({
-      name: 'Gateway',
+      name: t('gateway'),
       active: 0,
       total: 0,
       sessions: [],
@@ -136,12 +138,12 @@ export function FleetStatusWidget({ data }: { data: DashboardData }) {
   return (
     <div className="panel">
       <div className="panel-header">
-        <h3 className="text-sm font-semibold">Fleet Status</h3>
+        <h3 className="text-sm font-semibold">{t('fleet.title')}</h3>
       </div>
       <div className="divide-y divide-border/30">
         {rows.map((row) => {
           const sparkData = getSessionSparkline(row.sessions)
-          const isGateway = row.name === 'Gateway'
+          const isGateway = row.name === t('gateway')
 
           return (
             <div
@@ -161,12 +163,12 @@ export function FleetStatusWidget({ data }: { data: DashboardData }) {
                 {isGateway && isLocal ? (
                   <span className="inline-flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                    connected
+                    {t('fleet.connected')}
                   </span>
                 ) : isLoading ? (
                   '...'
                 ) : (
-                  <>{row.active} active</>
+                  <>{t('fleet.active', { count: row.active })}</>
                 )}
               </span>
 
@@ -180,7 +182,7 @@ export function FleetStatusWidget({ data }: { data: DashboardData }) {
                 ) : isLoading ? (
                   ''
                 ) : (
-                  `${row.total} total`
+                  t('fleet.total', { count: row.total })
                 )}
               </span>
 

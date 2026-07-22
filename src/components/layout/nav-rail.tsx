@@ -105,6 +105,7 @@ const navItemTranslationKeys: Record<string, string> = {
   nodes: 'nodes',
   'exec-approvals': 'approvals',
   office: 'office',
+  monitor: 'monitor',
   cron: 'cron',
   webhooks: 'webhooks',
   alerts: 'alerts',

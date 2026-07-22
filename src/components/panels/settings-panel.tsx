@@ -76,39 +76,45 @@ function parseCoordinatorTargetAgents(rawAgents: any[]): CoordinatorTargetAgent[
   })
 }
 
-const categoryLabels: Record<string, { label: string; icon: string; description: string }> = {
-  general: { label: 'General', icon: '⚙', description: 'Core Mission Control settings' },
-  security: { label: 'Security', icon: '🔑', description: 'API key management and security settings' },
-  retention: { label: 'Data Retention', icon: '🗄', description: 'How long data is kept before cleanup' },
-  chat: { label: 'Chat', icon: '💬', description: 'Coordinator routing and chat behavior settings' },
-  gateway: { label: 'Gateway', icon: '🔌', description: 'OpenClaw gateway connection settings' },
-  profiles: { label: 'Security Profiles', icon: 'shield', description: 'Hook profile controls security scanning strictness' },
-  custom: { label: 'Custom', icon: '🔧', description: 'User-defined settings' },
-}
-
 const categoryOrder = ['general', 'security', 'profiles', 'retention', 'chat', 'gateway', 'custom']
-
-// Dropdown options for subscription plan settings
-const subscriptionDropdowns: Record<string, { label: string; value: string }[]> = {
-  'subscription.plan_override': [
-    { label: 'Auto-detect', value: '' },
-    { label: 'Pro ($20/mo)', value: 'pro' },
-    { label: 'Max ($100/mo)', value: 'max' },
-    { label: 'Max 5x ($200/mo)', value: 'max_5x' },
-    { label: 'Team ($30/mo)', value: 'team' },
-    { label: 'Enterprise', value: 'enterprise' },
-  ],
-  'subscription.codex_plan': [
-    { label: 'None', value: '' },
-    { label: 'ChatGPT Free ($0/mo)', value: 'chatgpt' },
-    { label: 'Plus ($20/mo)', value: 'plus' },
-    { label: 'Pro ($200/mo)', value: 'pro' },
-    { label: 'Team ($30/mo)', value: 'team' },
-  ],
-}
 
 export function SettingsPanel() {
   const t = useTranslations('settings')
+  const categoryLabels: Record<string, string> = {
+    general: t('categories.general'), security: t('categories.security'), profiles: t('categories.profiles'),
+    retention: t('categories.retention'), chat: t('categories.chat'), gateway: t('categories.gateway'), custom: t('categories.custom'),
+  }
+  const subscriptionDropdowns: Record<string, { label: string; value: string }[]> = {
+    'subscription.plan_override': [
+      { label: t('subscription.autoDetect'), value: '' }, { label: 'Pro ($20/mo)', value: 'pro' },
+      { label: 'Max ($100/mo)', value: 'max' }, { label: 'Max 5x ($200/mo)', value: 'max_5x' },
+      { label: 'Team ($30/mo)', value: 'team' }, { label: t('subscription.enterprise'), value: 'enterprise' },
+    ],
+    'subscription.codex_plan': [
+      { label: t('subscription.none'), value: '' }, { label: 'ChatGPT Free ($0/mo)', value: 'chatgpt' },
+      { label: 'Plus ($20/mo)', value: 'plus' }, { label: 'Pro ($200/mo)', value: 'pro' },
+      { label: 'Team ($30/mo)', value: 'team' },
+    ],
+  }
+  const translatedSettings: Record<string, { label: string; description: string }> = {
+    'general.site_name': { label: t('settingDefinitions.siteName.label'), description: t('settingDefinitions.siteName.description') },
+    'general.auto_cleanup': { label: t('settingDefinitions.autoCleanup.label'), description: t('settingDefinitions.autoCleanup.description') },
+    'general.auto_backup': { label: t('settingDefinitions.autoBackup.label'), description: t('settingDefinitions.autoBackup.description') },
+    'general.backup_retention_count': { label: t('settingDefinitions.backupRetention.label'), description: t('settingDefinitions.backupRetention.description') },
+    'subscription.plan_override': { label: t('settingDefinitions.planOverride.label'), description: t('settingDefinitions.planOverride.description') },
+    'subscription.codex_plan': { label: t('settingDefinitions.codexPlan.label'), description: t('settingDefinitions.codexPlan.description') },
+    'general.interface_mode': { label: t('settingDefinitions.interfaceMode.label'), description: t('settingDefinitions.interfaceMode.description') },
+    'retention.activities_days': { label: t('settingDefinitions.activitiesDays.label'), description: t('settingDefinitions.activitiesDays.description') },
+    'retention.audit_log_days': { label: t('settingDefinitions.auditLogDays.label'), description: t('settingDefinitions.auditLogDays.description') },
+    'retention.logs_days': { label: t('settingDefinitions.logsDays.label'), description: t('settingDefinitions.logsDays.description') },
+    'retention.notifications_days': { label: t('settingDefinitions.notificationsDays.label'), description: t('settingDefinitions.notificationsDays.description') },
+    'retention.pipeline_runs_days': { label: t('settingDefinitions.pipelineRunsDays.label'), description: t('settingDefinitions.pipelineRunsDays.description') },
+    'retention.token_usage_days': { label: t('settingDefinitions.tokenUsageDays.label'), description: t('settingDefinitions.tokenUsageDays.description') },
+    'retention.gateway_sessions_days': { label: t('settingDefinitions.gatewaySessionsDays.label'), description: t('settingDefinitions.gatewaySessionsDays.description') },
+    'gateway.host': { label: t('settingDefinitions.gatewayHost.label'), description: t('settingDefinitions.gatewayHost.description') },
+    'gateway.port': { label: t('settingDefinitions.gatewayPort.label'), description: t('settingDefinitions.gatewayPort.description') },
+    'chat.coordinator_target_agent': { label: t('settingDefinitions.coordinatorTarget.label'), description: t('settingDefinitions.coordinatorTarget.description') },
+  }
   const { currentUser, setShowOnboarding } = useMissionControl()
   const navigateToPanel = useNavigateToPanel()
   const [settings, setSettings] = useState<Setting[]>([])
@@ -656,7 +662,7 @@ export function SettingsPanel() {
       {/* Category tabs */}
       <div className="flex gap-1 border-b border-border pb-px">
         {categories.map(cat => {
-          const meta = categoryLabels[cat] || { label: cat, icon: '📋', description: '' }
+          const categoryLabel = categoryLabels[cat] || cat
           const changedCount = (grouped[cat] || []).filter(s => edits[s.key] !== undefined && edits[s.key] !== s.value).length
           return (
             <Button
@@ -670,7 +676,7 @@ export function SettingsPanel() {
                   : ''
               }`}
             >
-              {meta.label}
+              {categoryLabel}
               {changedCount > 0 && (
                 <span className="ml-1.5 inline-flex items-center justify-center w-4 h-4 text-2xs rounded-full bg-primary text-primary-foreground">
                   {changedCount}
@@ -879,6 +885,7 @@ export function SettingsPanel() {
             ? getCoordinatorResolutionPreview(currentValue)
             : null
           const shortKey = setting.key.split('.').pop() || setting.key
+          const translatedSetting = translatedSettings[setting.key]
 
           return (
             <div
@@ -890,15 +897,15 @@ export function SettingsPanel() {
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-foreground">{formatLabel(shortKey)}</span>
+                    <span className="text-sm font-medium text-foreground">{translatedSetting?.label || formatLabel(shortKey)}</span>
                     {setting.is_default && (
-                      <span className="text-2xs px-1.5 py-0.5 rounded bg-muted text-muted-foreground">default</span>
+                      <span className="text-2xs px-1.5 py-0.5 rounded bg-muted text-muted-foreground">{t('defaultBadge')}</span>
                     )}
                     {isChanged && (
-                      <span className="text-2xs px-1.5 py-0.5 rounded bg-primary/15 text-primary">modified</span>
+                      <span className="text-2xs px-1.5 py-0.5 rounded bg-primary/15 text-primary">{t('modifiedBadge')}</span>
                     )}
                   </div>
-                  <p className="text-xs text-muted-foreground mt-0.5">{setting.description}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{translatedSetting?.description || setting.description}</p>
                   <p className="text-2xs text-muted-foreground/60 mt-1 font-mono">{setting.key}</p>
                 </div>
 
@@ -914,7 +921,7 @@ export function SettingsPanel() {
                           <option key={opt.value} value={opt.value}>{opt.label}</option>
                         ))}
                         {currentValue && !dropdownOptions.some(opt => opt.value === currentValue) && (
-                          <option value={currentValue}>Custom: {currentValue}</option>
+                          <option value={currentValue}>{t('customValue', { value: currentValue })}</option>
                         )}
                       </select>
                     ) : isBooleanish ? (
@@ -947,7 +954,7 @@ export function SettingsPanel() {
                     {!setting.is_default && (
                       <Button
                         onClick={() => handleReset(setting.key)}
-                        title="Reset to default"
+                        title={t('resetToDefault')}
                         variant="ghost"
                         size="icon-xs"
                         className="w-6 h-6"

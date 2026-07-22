@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import {
   QuickAction,
   SpawnActionIcon,
@@ -12,7 +13,12 @@ import {
 } from '../widget-primitives'
 
 /** Pick contextual actions based on current fleet/task state */
-function getContextualActions(data: DashboardData): Array<{
+function getContextualActions(data: DashboardData, labels: {
+  checkErrorLogs: string; errorsDetected: string; reviewPending: string; awaitingReview: string
+  dispatchTask: string; agentsIdle: string; createFirstAgent: string; setUpFleet: string
+  sessions: string; agents: string; fleetManagement: string; viewLogs: string; realtimeViewer: string
+  taskBoard: string; taskCounts: string; memory: string; knowledgeRecall: string
+}): Array<{
   label: string
   desc: string
   tab: string
@@ -43,8 +49,8 @@ function getContextualActions(data: DashboardData): Array<{
   // High priority: errors need attention
   if (errorCount > 0) {
     actions.push({
-      label: 'Check Error Logs',
-      desc: `${errorCount} error${errorCount !== 1 ? 's' : ''} detected`,
+      label: labels.checkErrorLogs,
+      desc: labels.errorsDetected,
       tab: 'logs',
       icon: <LogActionIcon />,
       priority: 100,
@@ -54,8 +60,8 @@ function getContextualActions(data: DashboardData): Array<{
   // High priority: tasks waiting for review
   if (reviewCount > 0) {
     actions.push({
-      label: 'Review Pending Tasks',
-      desc: `${reviewCount} task${reviewCount !== 1 ? 's' : ''} awaiting review`,
+      label: labels.reviewPending,
+      desc: labels.awaitingReview,
       tab: 'tasks',
       icon: <TaskActionIcon />,
       priority: 90,
@@ -65,8 +71,8 @@ function getContextualActions(data: DashboardData): Array<{
   // Contextual: agents/sessions idle — suggest dispatching work
   if (activeSessions === 0 && agentTotal > 0) {
     actions.push({
-      label: 'Dispatch a Task',
-      desc: 'Agents are idle',
+      label: labels.dispatchTask,
+      desc: labels.agentsIdle,
       tab: 'tasks',
       icon: <TaskActionIcon />,
       priority: 70,
@@ -76,8 +82,8 @@ function getContextualActions(data: DashboardData): Array<{
   // No agents at all — guide to setup
   if (!isLocal && agentTotal === 0) {
     actions.push({
-      label: 'Create First Agent',
-      desc: 'Set up your agent fleet',
+      label: labels.createFirstAgent,
+      desc: labels.setUpFleet,
       tab: 'spawn',
       icon: <SpawnActionIcon />,
       priority: 80,
@@ -87,7 +93,7 @@ function getContextualActions(data: DashboardData): Array<{
   // Default navigation actions (always available, lower priority)
   if (isLocal) {
     actions.push({
-      label: 'Sessions',
+      label: labels.sessions,
       desc: 'Claude + Codex + Hermes',
       tab: 'sessions',
       icon: <SessionIcon />,
@@ -95,8 +101,8 @@ function getContextualActions(data: DashboardData): Array<{
     })
   } else {
     actions.push({
-      label: 'Agents',
-      desc: 'Fleet management',
+      label: labels.agents,
+      desc: labels.fleetManagement,
       tab: 'agents',
       icon: <PipelineActionIcon />,
       priority: 30,
@@ -104,24 +110,24 @@ function getContextualActions(data: DashboardData): Array<{
   }
 
   actions.push({
-    label: 'View Logs',
-    desc: 'Realtime viewer',
+    label: labels.viewLogs,
+    desc: labels.realtimeViewer,
     tab: 'logs',
     icon: <LogActionIcon />,
     priority: 20,
   })
 
   actions.push({
-    label: 'Task Board',
-    desc: `${runningTasks} running · ${backlogCount} queued`,
+    label: labels.taskBoard,
+    desc: labels.taskCounts,
     tab: 'tasks',
     icon: <TaskActionIcon />,
     priority: 25,
   })
 
   actions.push({
-    label: 'Memory',
-    desc: 'Knowledge + recall',
+    label: labels.memory,
+    desc: labels.knowledgeRecall,
     tab: 'memory',
     icon: <MemoryActionIcon />,
     priority: 10,
@@ -141,8 +147,17 @@ function getContextualActions(data: DashboardData): Array<{
 }
 
 export function QuickActionsWidget({ data }: { data: DashboardData }) {
+  const t = useTranslations('fullDashboard.quickActions')
   const { navigateToPanel } = data
-  const actions = getContextualActions(data)
+  const actions = getContextualActions(data, {
+    checkErrorLogs: t('checkErrorLogs'), errorsDetected: t('errorsDetected', { count: data.errorCount }),
+    reviewPending: t('reviewPending'), awaitingReview: t('awaitingReview', { count: data.reviewCount }),
+    dispatchTask: t('dispatchTask'), agentsIdle: t('agentsIdle'), createFirstAgent: t('createFirstAgent'),
+    setUpFleet: t('setUpFleet'), sessions: t('sessions'), agents: t('agents'), fleetManagement: t('fleetManagement'),
+    viewLogs: t('viewLogs'), realtimeViewer: t('realtimeViewer'), taskBoard: t('taskBoard'),
+    taskCounts: t('taskCounts', { running: data.runningTasks, queued: data.backlogCount }),
+    memory: t('memory'), knowledgeRecall: t('knowledgeRecall'),
+  })
 
   return (
     <section className="grid grid-cols-2 lg:grid-cols-5 gap-2">

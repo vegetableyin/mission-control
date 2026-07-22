@@ -94,6 +94,7 @@
     "nodes": "Nodes",
     "approvals": "Approvals",
     "office": "Office",
+    "monitor": "Monitor",
     "logout": "Logout",
     "cron": "Schedules",
     "webhooks": "Webhooks",
@@ -147,6 +148,31 @@
     "onboardingDescription": "Replay the setup wizard and reset the dashboard checklist",
     "replayOnboarding": "Replay Onboarding",
     "resetting": "Resetting...",
+    "categories": { "general": "General", "security": "Security", "profiles": "Security Profiles", "retention": "Data Retention", "chat": "Chat", "gateway": "Gateway", "custom": "Custom" },
+    "subscription": { "autoDetect": "Auto-detect", "enterprise": "Enterprise", "none": "None" },
+    "defaultBadge": "default",
+    "modifiedBadge": "modified",
+    "customValue": "Custom: {value}",
+    "resetToDefault": "Reset to default",
+    "settingDefinitions": {
+      "siteName": { "label": "Site Name", "description": "Mission Control display name" },
+      "autoCleanup": { "label": "Auto Cleanup", "description": "Enable automatic data cleanup" },
+      "autoBackup": { "label": "Auto Backup", "description": "Enable automatic daily backups" },
+      "backupRetention": { "label": "Backup Retention Count", "description": "Number of backup files to keep" },
+      "planOverride": { "label": "Plan Override", "description": "Override the automatically detected subscription plan" },
+      "codexPlan": { "label": "Codex Plan", "description": "Codex/OpenAI subscription plan" },
+      "interfaceMode": { "label": "Interface Mode", "description": "Interface complexity: Essential or Full" },
+      "activitiesDays": { "label": "Activity Retention", "description": "Days to keep activity records" },
+      "auditLogDays": { "label": "Audit Log Retention", "description": "Days to keep audit log entries" },
+      "logsDays": { "label": "Log Retention", "description": "Days to keep log files" },
+      "notificationsDays": { "label": "Notification Retention", "description": "Days to keep notifications" },
+      "pipelineRunsDays": { "label": "Pipeline Run Retention", "description": "Days to keep pipeline run history" },
+      "tokenUsageDays": { "label": "Token Usage Retention", "description": "Days to keep token usage data" },
+      "gatewaySessionsDays": { "label": "Gateway Session Retention", "description": "Days to keep inactive gateway session metadata" },
+      "gatewayHost": { "label": "Gateway Host", "description": "Gateway hostname" },
+      "gatewayPort": { "label": "Gateway Port", "description": "Gateway port number" },
+      "coordinatorTarget": { "label": "Coordinator Target Agent", "description": "Optional coordinator routing target used before the default session fallback" }
+    },
     "interfaceMode": {
       "title": "Interface Mode",
       "description": "Choose a focused daily view or the complete Mission Control workspace.",
@@ -2226,6 +2252,40 @@
     "changeTheme": "Change theme",
     "dark": "Dark",
     "light": "Light"
+  },
+  "fullDashboard": {
+    "gateway": "Gateway",
+    "relativeTime": { "justNow": "just now", "minutesAgo": "{count}m ago", "hoursAgo": "{count}h ago", "daysAgo": "{count}d ago" },
+    "status": { "error": "Error", "done": "Done", "running": "Running", "idle": "Idle", "warning": "Warning", "info": "Info" },
+    "activity": { "title": "Activity", "live": "Live", "loading": "Loading activity...", "empty": "No activity yet", "emptyHint": "Agent events and task updates will appear here." },
+    "fleet": { "title": "Fleet Status", "connected": "connected", "active": "{count} active", "total": "{count} total" },
+    "pipeline": { "title": "Task Pipeline", "inbox": "Inbox", "assigned": "Assigned", "running": "Running", "review": "Review", "done": "Done", "tasks": "{count} tasks", "total": "{count} total", "empty": "No tasks yet", "waitingReview": "{count} tasks waiting for review" },
+    "quickActions": { "checkErrorLogs": "Check Error Logs", "errorsDetected": "{count} errors detected", "reviewPending": "Review Pending Tasks", "awaitingReview": "{count} tasks awaiting review", "dispatchTask": "Dispatch a Task", "agentsIdle": "Agents are idle", "createFirstAgent": "Create First Agent", "setUpFleet": "Set up your agent fleet", "sessions": "Sessions", "agents": "Agents", "fleetManagement": "Fleet management", "viewLogs": "View Logs", "realtimeViewer": "Realtime viewer", "taskBoard": "Task Board", "taskCounts": "{running} running · {queued} queued", "memory": "Memory", "knowledgeRecall": "Knowledge + recall" },
+    "customize": {
+      "availableWidgets": "Available Widgets", "resetDefaults": "Reset to Defaults", "done": "Done", "customize": "Customize",
+      "widgets": {
+        "briefingBar": { "label": "Briefing Bar", "description": "At-a-glance operational summary" },
+        "activityTimeline": { "label": "Activity Timeline", "description": "Agent events, task updates, and errors" },
+        "fleetStatus": { "label": "Fleet Status", "description": "Runtime activity, session counts, and cost" },
+        "taskPipeline": { "label": "Task Pipeline", "description": "Task flow with bottleneck highlighting" },
+        "systemHealth": { "label": "System Health", "description": "CPU, memory, disk, and uptime" },
+        "metricCards": { "label": "Key Metrics", "description": "Sessions, load, tokens, and cost" },
+        "runtimeHealth": { "label": "Runtime Health", "description": "Local runtime and core service health" },
+        "gatewayHealth": { "label": "Gateway Health", "description": "Gateway traffic, errors, and saturation" },
+        "sessionWorkbench": { "label": "Session Workbench", "description": "Live sessions and activity indicators" },
+        "eventStream": { "label": "Event Stream", "description": "Merged log stream from all sources" },
+        "taskFlow": { "label": "Task Flow", "description": "Task counts by workflow state" },
+        "githubSignal": { "label": "GitHub Signal", "description": "Repository issues, stars, and activity" },
+        "securityAudit": { "label": "Security & Audit", "description": "Audit events, login failures, and notifications" },
+        "maintenance": { "label": "Maintenance & Backup", "description": "Backup status and pipeline health" },
+        "quickActions": { "label": "Quick Actions", "description": "Shortcuts to key panels" }
+      }
+    }
+  },
+  "agentRuntimes": {
+    "title": "Agent Runtimes", "description": "Install and manage runtimes used by AI agents.", "localInstallsDisabled": "Local installs are disabled by default. Review the runtime supply-chain settings before enabling them.", "dockerMode": "Running in Docker — install directly or use sidecar services for production.",
+    "installing": "Installing...", "installed": "Installed", "notInstalled": "Not installed", "running": "Running", "stopped": "Stopped", "refresh": "Refresh", "install": "Install", "sidecarYaml": "Sidecar YAML", "authenticated": "Authenticated", "configure": "Configure {runtime}", "retry": "Retry", "unknownError": "Unknown error", "installFailed": "Install failed: {error}", "installedSuccessfullyShort": "Installed successfully", "hideOutput": "Hide output", "showOutput": "Show output", "enableInstallsFirst": "Enable reviewed runtime installs in the server environment first",
+    "installedSuccessfully": "{runtime} installed successfully", "installFailedFor": "{runtime} install failed", "failedToStartInstall": "Failed to start install", "composeCopied": "Docker compose snippet copied", "failedToCopy": "Failed to copy", "detectionRefreshed": "Detection refreshed", "detectionFailed": "Detection failed", "setupComplete": "{runtime} setup complete"
   },
   "essentialDashboard": {
     "title": "Personal Command Center",

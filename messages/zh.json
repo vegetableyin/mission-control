@@ -94,6 +94,7 @@
     "nodes": "节点",
     "approvals": "审批",
     "office": "办公室",
+    "monitor": "系统监控",
     "cron": "定时任务",
     "webhooks": "Webhooks",
     "alerts": "告警",
@@ -147,6 +148,31 @@
     "onboardingDescription": "重放设置向导并重置仪表板清单",
     "replayOnboarding": "重放引导",
     "resetting": "重置中...",
+    "categories": { "general": "通用", "security": "安全", "profiles": "安全配置", "retention": "数据保留", "chat": "聊天", "gateway": "网关", "custom": "自定义" },
+    "subscription": { "autoDetect": "自动检测", "enterprise": "企业版", "none": "无" },
+    "defaultBadge": "默认",
+    "modifiedBadge": "已修改",
+    "customValue": "自定义：{value}",
+    "resetToDefault": "恢复默认值",
+    "settingDefinitions": {
+      "siteName": { "label": "站点名称", "description": "Mission Control 的显示名称" },
+      "autoCleanup": { "label": "自动清理", "description": "启用自动数据清理" },
+      "autoBackup": { "label": "自动备份", "description": "启用每日自动备份" },
+      "backupRetention": { "label": "备份保留数量", "description": "需要保留的备份文件数量" },
+      "planOverride": { "label": "订阅方案覆盖", "description": "覆盖自动检测到的订阅方案" },
+      "codexPlan": { "label": "Codex 方案", "description": "Codex/OpenAI 订阅方案" },
+      "interfaceMode": { "label": "界面模式", "description": "界面复杂度：精简模式或完整模式" },
+      "activitiesDays": { "label": "活动记录保留", "description": "活动记录保留天数" },
+      "auditLogDays": { "label": "审计日志保留", "description": "审计日志条目保留天数" },
+      "logsDays": { "label": "日志保留", "description": "日志文件保留天数" },
+      "notificationsDays": { "label": "通知保留", "description": "通知保留天数" },
+      "pipelineRunsDays": { "label": "流程运行记录保留", "description": "流程运行历史保留天数" },
+      "tokenUsageDays": { "label": "Token 用量保留", "description": "Token 用量数据保留天数" },
+      "gatewaySessionsDays": { "label": "网关会话保留", "description": "非活动网关会话元数据保留天数" },
+      "gatewayHost": { "label": "网关主机", "description": "网关主机名" },
+      "gatewayPort": { "label": "网关端口", "description": "网关端口号" },
+      "coordinatorTarget": { "label": "协调器目标智能体", "description": "在默认会话回退前使用的可选协调器路由目标" }
+    },
     "interfaceMode": {
       "title": "界面模式",
       "description": "选择日常使用的精简驾驶舱，或完整的 Mission Control 工作区。",
@@ -2226,6 +2252,40 @@
     "changeTheme": "切换主题",
     "dark": "深色",
     "light": "浅色"
+  },
+  "fullDashboard": {
+    "gateway": "网关",
+    "relativeTime": { "justNow": "刚刚", "minutesAgo": "{count} 分钟前", "hoursAgo": "{count} 小时前", "daysAgo": "{count} 天前" },
+    "status": { "error": "错误", "done": "完成", "running": "运行中", "idle": "空闲", "warning": "警告", "info": "信息" },
+    "activity": { "title": "活动记录", "live": "实时", "loading": "正在加载活动...", "empty": "暂无活动", "emptyHint": "智能体事件和任务更新将显示在这里。" },
+    "fleet": { "title": "运行状态", "connected": "已连接", "active": "{count} 个活跃", "total": "共 {count} 个" },
+    "pipeline": { "title": "任务流程", "inbox": "待分配", "assigned": "已分配", "running": "运行中", "review": "待审核", "done": "已完成", "tasks": "{count} 个任务", "total": "共 {count} 个", "empty": "暂无任务", "waitingReview": "{count} 个任务等待审核" },
+    "quickActions": { "checkErrorLogs": "检查错误日志", "errorsDetected": "检测到 {count} 个错误", "reviewPending": "审核待处理任务", "awaitingReview": "{count} 个任务等待审核", "dispatchTask": "派发任务", "agentsIdle": "智能体当前空闲", "createFirstAgent": "创建首个智能体", "setUpFleet": "配置智能体队列", "sessions": "会话", "agents": "智能体", "fleetManagement": "智能体管理", "viewLogs": "查看日志", "realtimeViewer": "实时日志查看器", "taskBoard": "任务看板", "taskCounts": "{running} 个运行中 · {queued} 个排队中", "memory": "记忆", "knowledgeRecall": "知识与检索" },
+    "customize": {
+      "availableWidgets": "可用组件", "resetDefaults": "恢复默认布局", "done": "完成", "customize": "自定义",
+      "widgets": {
+        "briefingBar": { "label": "运行摘要", "description": "快速查看当前需要关注的运行事项" },
+        "activityTimeline": { "label": "活动时间线", "description": "智能体事件、任务更新和错误" },
+        "fleetStatus": { "label": "运行状态", "description": "运行时活动、会话数量和费用" },
+        "taskPipeline": { "label": "任务流程", "description": "带瓶颈提示的任务流转状态" },
+        "systemHealth": { "label": "系统健康", "description": "CPU、内存、磁盘和运行时间" },
+        "metricCards": { "label": "关键指标", "description": "会话、负载、Token 和费用" },
+        "runtimeHealth": { "label": "运行时健康", "description": "本地运行时与核心服务健康状态" },
+        "gatewayHealth": { "label": "网关健康", "description": "网关流量、错误和饱和度" },
+        "sessionWorkbench": { "label": "会话工作台", "description": "实时会话和活动指示" },
+        "eventStream": { "label": "事件流", "description": "来自所有来源的合并日志流" },
+        "taskFlow": { "label": "任务流", "description": "按工作流状态统计任务" },
+        "githubSignal": { "label": "GitHub 动态", "description": "仓库议题、星标和活动" },
+        "securityAudit": { "label": "安全与审计", "description": "审计事件、登录失败和通知" },
+        "maintenance": { "label": "维护与备份", "description": "备份状态和流程健康" },
+        "quickActions": { "label": "快捷操作", "description": "常用面板快捷入口" }
+      }
+    }
+  },
+  "agentRuntimes": {
+    "title": "智能体运行时", "description": "安装和管理 AI 智能体使用的运行时。", "localInstallsDisabled": "默认禁用本地安装；启用前请检查运行时供应链设置。", "dockerMode": "当前运行在 Docker 中，可直接安装或在生产环境使用 Sidecar 服务。",
+    "installing": "正在安装...", "installed": "已安装", "notInstalled": "未安装", "running": "运行中", "stopped": "已停止", "refresh": "刷新", "install": "安装", "sidecarYaml": "Sidecar YAML", "authenticated": "已登录", "configure": "配置 {runtime}", "retry": "重试", "unknownError": "未知错误", "installFailed": "安装失败：{error}", "installedSuccessfullyShort": "安装成功", "hideOutput": "隐藏输出", "showOutput": "显示输出", "enableInstallsFirst": "请先在服务端环境中启用已审核的运行时安装",
+    "installedSuccessfully": "{runtime} 安装成功", "installFailedFor": "{runtime} 安装失败", "failedToStartInstall": "无法开始安装", "composeCopied": "Docker Compose 配置片段已复制", "failedToCopy": "复制失败", "detectionRefreshed": "检测结果已刷新", "detectionFailed": "检测失败", "setupComplete": "{runtime} 配置完成"
   },
   "essentialDashboard": {
     "title": "个人驾驶舱",

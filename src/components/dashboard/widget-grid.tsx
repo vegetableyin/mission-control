@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
+import { useTranslations } from 'next-intl'
 import { useMissionControl } from '@/store'
 import { WIDGET_CATALOG, getDefaultLayout, getAvailableWidgets, getWidgetById } from '@/lib/dashboard-widgets'
 import { Button } from '@/components/ui/button'
@@ -49,6 +50,7 @@ const SIZE_CLASSES: Record<string, string> = {
 }
 
 export function WidgetGrid({ data }: { data: DashboardData }) {
+  const t = useTranslations('fullDashboard.customize')
   const { dashboardLayout, setDashboardLayout, dashboardMode } = useMissionControl()
   const mode = dashboardMode === 'local' ? 'local' : 'full'
   const [customizing, setCustomizing] = useState(false)
@@ -68,6 +70,23 @@ export function WidgetGrid({ data }: { data: DashboardData }) {
 
   // Widgets not in current layout but available for this mode
   const hiddenWidgets = available.filter((w) => !validLayout.includes(w.id))
+  const translatedWidgets: Record<string, { label: string; description: string }> = {
+    'briefing-bar': { label: t('widgets.briefingBar.label'), description: t('widgets.briefingBar.description') },
+    'activity-timeline': { label: t('widgets.activityTimeline.label'), description: t('widgets.activityTimeline.description') },
+    'fleet-status': { label: t('widgets.fleetStatus.label'), description: t('widgets.fleetStatus.description') },
+    'task-pipeline': { label: t('widgets.taskPipeline.label'), description: t('widgets.taskPipeline.description') },
+    'system-health': { label: t('widgets.systemHealth.label'), description: t('widgets.systemHealth.description') },
+    'metric-cards': { label: t('widgets.metricCards.label'), description: t('widgets.metricCards.description') },
+    'runtime-health': { label: t('widgets.runtimeHealth.label'), description: t('widgets.runtimeHealth.description') },
+    'gateway-health': { label: t('widgets.gatewayHealth.label'), description: t('widgets.gatewayHealth.description') },
+    'session-workbench': { label: t('widgets.sessionWorkbench.label'), description: t('widgets.sessionWorkbench.description') },
+    'event-stream': { label: t('widgets.eventStream.label'), description: t('widgets.eventStream.description') },
+    'task-flow': { label: t('widgets.taskFlow.label'), description: t('widgets.taskFlow.description') },
+    'github-signal': { label: t('widgets.githubSignal.label'), description: t('widgets.githubSignal.description') },
+    'security-audit': { label: t('widgets.securityAudit.label'), description: t('widgets.securityAudit.description') },
+    'maintenance': { label: t('widgets.maintenance.label'), description: t('widgets.maintenance.description') },
+    'quick-actions': { label: t('widgets.quickActions.label'), description: t('widgets.quickActions.description') },
+  }
 
   const handleDragStart = (e: React.DragEvent, widgetId: string) => {
     setDragId(widgetId)
@@ -241,19 +260,22 @@ export function WidgetGrid({ data }: { data: DashboardData }) {
       {/* Customize mode: hidden widgets + controls */}
       {customizing && hiddenWidgets.length > 0 && (
         <section className="space-y-2">
-          <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Available Widgets</h4>
+          <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('availableWidgets')}</h4>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
-            {hiddenWidgets.map((widget) => (
-              <button
-                key={widget.id}
-                type="button"
-                onClick={() => addWidget(widget.id)}
-                className="rounded-lg border border-dashed border-border/60 p-3 text-left hover:border-primary/40 hover:bg-primary/5 transition-smooth"
-              >
-                <div className="text-xs font-medium text-foreground/70">{widget.label}</div>
-                <div className="text-2xs text-muted-foreground mt-0.5">{widget.description}</div>
-              </button>
-            ))}
+            {hiddenWidgets.map((widget) => {
+              const translatedWidget = translatedWidgets[widget.id] || widget
+              return (
+                <button
+                  key={widget.id}
+                  type="button"
+                  onClick={() => addWidget(widget.id)}
+                  className="rounded-lg border border-dashed border-border/60 p-3 text-left hover:border-primary/40 hover:bg-primary/5 transition-smooth"
+                >
+                  <div className="text-xs font-medium text-foreground/70">{translatedWidget.label}</div>
+                  <div className="text-2xs text-muted-foreground mt-0.5">{translatedWidget.description}</div>
+                </button>
+              )
+            })}
           </div>
         </section>
       )}
@@ -267,7 +289,7 @@ export function WidgetGrid({ data }: { data: DashboardData }) {
             onClick={resetToDefaults}
             className="text-2xs h-7"
           >
-            Reset to Defaults
+            {t('resetDefaults')}
           </Button>
         )}
         <Button
@@ -276,7 +298,7 @@ export function WidgetGrid({ data }: { data: DashboardData }) {
           onClick={() => setCustomizing(!customizing)}
           className="text-2xs h-7"
         >
-          {customizing ? 'Done' : 'Customize'}
+          {customizing ? t('done') : t('customize')}
         </Button>
       </div>
     </div>
