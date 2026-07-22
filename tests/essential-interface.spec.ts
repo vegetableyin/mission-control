@@ -16,7 +16,7 @@ test.describe('Essential interface', () => {
     await page.addInitScript(() => window.sessionStorage.setItem('mc-onboarding-dismissed', '1'))
     const login = await page.request.post('/api/auth/login', {
       data: { username: 'testadmin', password: 'testpass1234!' },
-      headers: { 'x-forwarded-for': '10.67.0.1' },
+      headers: { 'x-real-ip': '10.67.0.1' },
     })
     expect(login.ok()).toBe(true)
   })
@@ -33,7 +33,7 @@ test.describe('Essential interface', () => {
     expect(await page.locator('main').innerText()).not.toMatch(/\b(?:taskBoard|essentialDashboard|projectsOverview|codexStatus|attentionCenter)\.[A-Za-z][\w.]+\b/)
 
     await page.getByRole('button', { name: '设置', exact: true }).click()
-    await expect(page.getByText('界面模式')).toBeVisible({ timeout: 30_000 })
+    await expect(page.getByRole('heading', { name: '界面模式', exact: true })).toBeVisible({ timeout: 30_000 })
     await page.getByRole('button', { name: /完整模式 Full/ }).click()
     await expect(page.getByRole('button', { name: '记忆', exact: true })).toBeVisible()
     await page.reload()
