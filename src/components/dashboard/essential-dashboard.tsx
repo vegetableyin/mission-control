@@ -87,7 +87,9 @@ export function EssentialDashboard() {
 
   const view = useMemo(() => {
     const projects = buildProjectStatus(data.projects, data.tasks)
-    const activeProjects = projects.filter((project) => project.status === 'active')
+    const activeProjects = projects.filter((project) => project.status === 'in_progress')
+    const attentionProjects = projects.filter((project) => project.health_status === 'attention')
+    const scanErrorProjects = projects.filter((project) => Boolean(project.scan_error))
     const todayTasks = data.tasks.filter((task) => isTaskToday(task))
     const failedTasks = data.tasks.filter((task) => task.status === 'failed')
     const blockedTasks = data.tasks.filter(isBlockedTask)
@@ -95,12 +97,15 @@ export function EssentialDashboard() {
     const activeAlerts = data.rules.filter((rule) => rule.enabled && rule.trigger_count > 0)
     const codexSessions = data.sessions.filter((session) => session.kind.toLowerCase().includes('codex'))
     const attention = [
+      ...projects.filter((project) => project.blocked).map((project) => ({ id: `project-blocked-${project.id}`, kind: 'blocked' as const, tone: 'danger' as const, label: t('blockedProject'), title: project.name, panel: 'projects' })),
+      ...attentionProjects.map((project) => ({ id: `project-attention-${project.id}`, kind: 'waiting' as const, tone: 'warn' as const, label: t('attentionProject'), title: project.name, panel: 'projects' })),
+      ...scanErrorProjects.map((project) => ({ id: `project-scan-${project.id}`, kind: 'alert' as const, tone: 'danger' as const, label: t('scanErrorProject'), title: project.name, panel: 'projects' })),
       ...waitingTasks.map((task) => ({ id: `waiting-${task.id}`, kind: 'waiting' as const, tone: 'warn' as const, label: t('waitingTask'), title: task.title, panel: 'tasks' })),
       ...failedTasks.map((task) => ({ id: `failed-${task.id}`, kind: 'failed' as const, tone: 'danger' as const, label: t('failedTask'), title: task.title, panel: 'tasks' })),
       ...blockedTasks.map((task) => ({ id: `blocked-${task.id}`, kind: 'blocked' as const, tone: 'danger' as const, label: t('blockedTask'), title: task.title, panel: 'tasks' })),
       ...activeAlerts.map((rule) => ({ id: `alert-${rule.id}`, kind: 'alert' as const, tone: 'warn' as const, label: t('alert'), title: rule.name, panel: 'alerts' })),
     ].sort((a, b) => operatorAttentionSeverity(b.kind) - operatorAttentionSeverity(a.kind)).slice(0, 8)
-    return { projects, activeProjects, todayTasks, failedTasks, blockedTasks, waitingTasks, activeAlerts, codexSessions, attention }
+    return { projects, activeProjects, attentionProjects, scanErrorProjects, todayTasks, failedTasks, blockedTasks, waitingTasks, activeAlerts, codexSessions, attention }
   }, [data, t])
 
   const todayKey = new Intl.DateTimeFormat('zh-CN', { timeZone: 'Asia/Shanghai', month: 'long', day: 'numeric', weekday: 'long' }).format(new Date())
@@ -152,15 +157,15 @@ export function EssentialDashboard() {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full min-w-[680px] text-left text-xs">
-                <thead className="text-muted-foreground"><tr><th className="pb-3 font-medium">{t('projects.name')}</th><th className="pb-3 font-medium">{t('projects.status')}</th><th className="pb-3 font-medium">{t('projects.lastActivity')}</th><th className="pb-3 text-right font-medium">{t('projects.open')}</th><th className="pb-3 text-right font-medium">{t('projects.failed')}</th><th /></tr></thead>
+                <thead className="text-muted-foreground"><tr><th className="pb-3 font-medium">{t('projects.name')}</th><th className="pb-3 font-medium">{t('projects.status')}</th><th className="pb-3 font-medium">{t('projects.health')}</th><th className="pb-3 font-medium">{t('projects.lastCommit')}</th><th className="pb-3 font-medium">{t('projects.lastActivity')}</th><th /></tr></thead>
                 <tbody className="divide-y divide-border/60">
                   {view.projects.slice(0, 8).map((project) => (
                     <tr key={project.id} className="group">
                       <td className="py-3 font-medium text-foreground">{project.name}</td>
-                      <td className="py-3"><span className={project.blocked ? 'text-red-400' : project.stale ? 'text-amber-400' : 'text-emerald-400'}>{project.blocked ? t('status.blocked') : project.stale ? t('status.stale') : t(`status.${project.status === 'active' ? 'active' : 'inactive'}`)}</span></td>
+                      <td className="py-3"><span className={project.blocked ? 'text-red-400' : project.stale ? 'text-amber-400' : 'text-emerald-400'}>{project.blocked ? t('status.blocked') : project.stale ? t('status.stale') : t(`status.${project.status === 'in_progress' ? 'active' : 'inactive'}`)}</span></td>
+                      <td className="py-3 text-muted-foreground">{t(`projectHealth.${project.health_status || 'unknown'}`)}{project.health_score != null ? ` · ${project.health_score}` : ''}</td>
+                      <td className="max-w-[200px] py-3"><div className="truncate text-muted-foreground">{project.git_last_commit_title || '—'}</div></td>
                       <td className="py-3 text-muted-foreground">{formatShanghaiDateTime(project.lastActivity, locale)}</td>
-                      <td className="py-3 text-right tabular-nums">{project.unfinishedTasks}</td>
-                      <td className={`py-3 text-right tabular-nums ${project.failedTasks ? 'text-red-400' : 'text-muted-foreground'}`}>{project.failedTasks}</td>
                       <td className="py-3 text-right"><button onClick={() => navigate('tasks')} className="text-primary opacity-80 hover:underline group-hover:opacity-100">{t('projects.next')}</button></td>
                     </tr>
                   ))}

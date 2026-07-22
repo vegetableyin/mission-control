@@ -1,4 +1,5 @@
 import type { Project, Task } from '@/store'
+import { projectInventorySortRank } from './project-health'
 
 export const SHANGHAI_TIME_ZONE = 'Asia/Shanghai'
 export const STALE_PROJECT_DAYS = 14
@@ -67,7 +68,6 @@ export function buildProjectStatus(
   tasks: Task[],
   now = Date.now(),
 ): ProjectWithActivity[] {
-  const staleBefore = now - STALE_PROJECT_DAYS * 24 * 60 * 60 * 1000
   return projects.map((project) => {
     const projectTasks = tasks.filter((task) => task.project_id === project.id)
     const unfinished = projectTasks.filter((task) => task.status !== 'done')
@@ -75,23 +75,28 @@ export function buildProjectStatus(
     const taskActivity = projectTasks
       .map((task) => epochMs(task.updated_at))
       .filter((value): value is number => value !== null)
-    const projectActivity = epochMs((project as Project & { updated_at?: number }).updated_at)
-    const lastActivity = [projectActivity, ...taskActivity]
+    const projectActivity = epochMs(project.last_activity_at) ?? epochMs(project.updated_at)
+    const gitActivity = epochMs(project.git_last_commit_at)
+    const lastActivity = [projectActivity, gitActivity, ...taskActivity]
       .filter((value): value is number => value !== null)
       .sort((a, b) => b - a)[0] ?? null
-    const blocked = ['blocked', 'error'].includes(project.status) || projectTasks.some(isBlockedTask)
+    const blocked = project.health_status === 'blocked' || ['blocked', 'error'].includes(project.status) || projectTasks.some(isBlockedTask)
+    const monitored = !['completed', 'paused', 'archived'].includes(project.status)
+    const staleDays = project.stale_after_days || STALE_PROJECT_DAYS
+    const projectStaleBefore = now - staleDays * 24 * 60 * 60 * 1000
     return {
       ...project,
       unfinishedTasks: unfinished.length,
       failedTasks,
       lastActivity,
       blocked,
-      stale: project.status === 'active' && Boolean(lastActivity && lastActivity < staleBefore),
+      stale: project.health_status === 'stale' || (monitored && Boolean(lastActivity && lastActivity < projectStaleBefore)),
     }
   }).sort((a, b) => {
-    const severityA = (a.blocked ? 4 : 0) + (a.failedTasks > 0 ? 2 : 0) + (a.stale ? 1 : 0)
-    const severityB = (b.blocked ? 4 : 0) + (b.failedTasks > 0 ? 2 : 0) + (b.stale ? 1 : 0)
-    if (severityA !== severityB) return severityB - severityA
+    const rankA = projectInventorySortRank({ ...a, health_status: a.blocked ? 'blocked' : a.stale ? 'stale' : a.health_status })
+    const rankB = projectInventorySortRank({ ...b, health_status: b.blocked ? 'blocked' : b.stale ? 'stale' : b.health_status })
+    if (rankA !== rankB) return rankA - rankB
+    if (a.failedTasks !== b.failedTasks) return b.failedTasks - a.failedTasks
     return (b.lastActivity ?? 0) - (a.lastActivity ?? 0)
   })
 }
