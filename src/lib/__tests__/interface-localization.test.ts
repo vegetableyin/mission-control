@@ -22,6 +22,9 @@ describe('Essential and Full interface localization', () => {
       autoBackup: { label: '自动备份' }, backupRetention: { label: '备份保留数量' },
       planOverride: { label: '订阅方案覆盖' },
     })
+    expect(zh.settings.hermes).toMatchObject({
+      gatewayRunning: '网关运行中', gatewayOffline: '网关已离线', working: '处理中...',
+    })
     expect(zh.agentRuntimes).toMatchObject({
       title: '智能体运行时', installed: '已安装', running: '运行中', stopped: '已停止', refresh: '刷新',
     })
@@ -42,6 +45,8 @@ describe('Essential and Full interface localization', () => {
     expect(pipeline).not.toContain('>Task Pipeline</h3>')
     expect(settings).not.toContain("label: 'General'")
     expect(settings).not.toContain("label: 'Security Profiles'")
+    expect(settings).not.toContain("'Gateway running'")
+    expect(settings).not.toContain("'Gateway offline'")
     expect(runtimes).toContain("useTranslations('agentRuntimes')")
     expect(runtimes).not.toContain('>Agent Runtimes</h3>')
     expect(nav).toContain("monitor: 'monitor'")

@@ -120,6 +120,22 @@
   },
   "settings": {
     "loading": "Loading settings...",
+    "hermes": {
+      "gatewayRunning": "Gateway running",
+      "gatewayOffline": "Gateway offline",
+      "activeSessions": "{count} active",
+      "cronJobs": "{count} cron",
+      "memoryEntries": "{count} memory",
+      "hookInstalled": "MC hook installed — receiving telemetry from hermes-agent",
+      "hookMissing": "Install the MC hook for richer telemetry (agent status and session events)",
+      "installSuccess": "Hook installed",
+      "uninstallSuccess": "Hook uninstalled",
+      "operationFailed": "Hook operation failed",
+      "networkError": "Network error",
+      "working": "Working...",
+      "uninstallHook": "Uninstall Hook",
+      "installHook": "Install MC Hook"
+    },
     "language": "Language",
     "languageDescription": "Choose your preferred display language",
     "general": "General",

@@ -586,28 +586,28 @@ export function SettingsPanel() {
                         ? 'bg-green-500/15 text-green-400'
                         : 'bg-muted text-muted-foreground'
                     }`}>
-                      {hermesStatus.gatewayRunning ? 'Gateway running' : 'Gateway offline'}
+                      {hermesStatus.gatewayRunning ? t('hermes.gatewayRunning') : t('hermes.gatewayOffline')}
                     </span>
                     {hermesStatus.activeSessions > 0 && (
                       <span className="text-2xs px-1.5 py-0.5 rounded bg-blue-500/15 text-blue-400">
-                        {hermesStatus.activeSessions} active
+                        {t('hermes.activeSessions', { count: hermesStatus.activeSessions })}
                       </span>
                     )}
                     {(hermesStatus.cronJobCount ?? 0) > 0 && (
                       <span className="text-2xs px-1.5 py-0.5 rounded bg-purple-500/15 text-purple-400">
-                        {hermesStatus.cronJobCount} cron
+                        {t('hermes.cronJobs', { count: hermesStatus.cronJobCount ?? 0 })}
                       </span>
                     )}
                     {(hermesStatus.memoryEntries ?? 0) > 0 && (
                       <span className="text-2xs px-1.5 py-0.5 rounded bg-purple-500/15 text-purple-400">
-                        {hermesStatus.memoryEntries} mem
+                        {t('hermes.memoryEntries', { count: hermesStatus.memoryEntries ?? 0 })}
                       </span>
                     )}
                   </div>
                   <p className="text-2xs text-muted-foreground mt-0.5">
                     {hermesStatus.hookInstalled
-                      ? 'MC hook installed — receiving telemetry from hermes-agent'
-                      : 'Install the MC hook for richer telemetry (agent status, session events)'}
+                      ? t('hermes.hookInstalled')
+                      : t('hermes.hookMissing')}
                   </p>
                 </div>
                 <Button
@@ -626,23 +626,23 @@ export function SettingsPanel() {
                       })
                       const data = await res.json()
                       if (res.ok) {
-                        showFeedback(true, data.message || `Hook ${action === 'install-hook' ? 'installed' : 'uninstalled'}`)
+                        showFeedback(true, data.message || (action === 'install-hook' ? t('hermes.installSuccess') : t('hermes.uninstallSuccess')))
                         fetchHermesStatus()
                       } else {
-                        showFeedback(false, data.error || 'Hook operation failed')
+                        showFeedback(false, data.error || t('hermes.operationFailed'))
                       }
                     } catch {
-                      showFeedback(false, 'Network error')
+                      showFeedback(false, t('hermes.networkError'))
                     } finally {
                       setHermesHookAction(false)
                     }
                   }}
                 >
                   {hermesHookAction
-                    ? 'Working...'
+                    ? t('hermes.working')
                     : hermesStatus.hookInstalled
-                      ? 'Uninstall Hook'
-                      : 'Install MC Hook'}
+                      ? t('hermes.uninstallHook')
+                      : t('hermes.installHook')}
                 </Button>
               </div>
             </div>

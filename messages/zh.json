@@ -120,6 +120,22 @@
   },
   "settings": {
     "loading": "正在加载设置...",
+    "hermes": {
+      "gatewayRunning": "网关运行中",
+      "gatewayOffline": "网关已离线",
+      "activeSessions": "{count} 个活动会话",
+      "cronJobs": "{count} 个定时任务",
+      "memoryEntries": "{count} 条记忆",
+      "hookInstalled": "MC Hook 已安装，正在接收 hermes-agent 遥测数据",
+      "hookMissing": "安装 MC Hook 以获取更完整的遥测数据（智能体状态和会话事件）",
+      "installSuccess": "Hook 安装成功",
+      "uninstallSuccess": "Hook 卸载成功",
+      "operationFailed": "Hook 操作失败",
+      "networkError": "网络错误",
+      "working": "处理中...",
+      "uninstallHook": "卸载 Hook",
+      "installHook": "安装 MC Hook"
+    },
     "language": "语言",
     "languageDescription": "选择您偏好的显示语言",
     "general": "通用",
