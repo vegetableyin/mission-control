@@ -2313,17 +2313,29 @@
     "waitingTask": "等待确认",
     "failedTask": "失败任务",
     "blockedTask": "阻塞任务",
+    "blockedProject": "阻塞项目",
+    "attentionProject": "项目需要关注",
+    "scanErrorProject": "项目扫描失败",
     "alert": "告警",
     "metrics": { "activeProjects": "进行中项目", "blockedProjects": "阻塞项目", "todayTasks": "今日任务", "failedTasks": "失败任务", "waiting": "等待确认", "staleProjects": "长时间无活动" },
     "attention": { "title": "今日待处理", "empty": "目前没有需要你处理的事项。" },
-    "projects": { "title": "项目状态", "empty": "尚未创建项目。", "name": "项目名称", "status": "状态", "lastActivity": "最近活动", "open": "未完成", "failed": "失败", "next": "查看任务" },
+    "projects": { "title": "项目状态", "empty": "尚未登记项目，可以扫描 D:\\Work 或手动添加。", "name": "项目名称", "status": "状态", "health": "健康度", "lastCommit": "最近提交", "lastActivity": "最近活动", "open": "未完成", "failed": "失败", "next": "查看任务" },
+    "projectHealth": { "healthy": "健康", "attention": "需要关注", "blocked": "阻塞", "stale": "长期无活动", "unknown": "未知" },
     "status": { "blocked": "阻塞", "stale": "长期无活动", "active": "进行中", "inactive": "非活跃" },
     "codex": { "title": "Codex 状态", "running": "运行中会话", "idle": "空闲会话", "empty": "暂无最近的 Codex 会话。" },
     "schedules": { "title": "定时任务", "ranToday": "今日已执行", "failedToday": "今日失败", "nextRun": "下次执行", "paused": "已暂停" },
     "activity": { "title": "最近活动", "empty": "暂无最近活动。" }
   },
   "projectsOverview": {
-    "title": "项目", "description": "根据现有项目和任务数据展示当前健康状态与工作量。", "manage": "管理项目", "loading": "正在加载项目...", "empty": "尚未创建项目。", "create": "创建项目", "name": "项目名称", "status": "状态", "lastActivity": "最近活动", "unfinished": "未完成任务", "failed": "失败任务", "openTasks": "查看任务", "blocked": "阻塞", "stale": "长期无活动", "active": "进行中"
+    "title": "项目", "description": "管理本地项目台账、只读 Git 健康状态和下一步行动。", "manage": "管理项目", "loading": "正在加载项目...", "empty": "尚未创建项目。", "emptyInventory": "尚未登记项目，可以扫描配置的工作目录或手动添加。", "create": "创建项目", "name": "项目名称", "status": "状态", "lastActivity": "最近活动", "unfinished": "未完成任务", "failed": "失败任务", "openTasks": "查看任务", "blocked": "阻塞", "stale": "长期无活动", "active": "进行中",
+    "inventory": "项目台账", "candidates": "待导入", "scanWork": "扫描工作目录", "scanAll": "扫描已登记项目", "scanning": "扫描中...", "scanComplete": "扫描完成，发现 {count} 个候选项目。", "allScanned": "已扫描 {count} 个登记项目。", "projectScanned": "已扫描 {name}。", "imported": "已导入 {name}。", "import": "导入", "importing": "导入中...", "candidateEmpty": "暂无待导入项目，请执行扫描刷新列表。",
+    "search": "搜索", "searchPlaceholder": "搜索名称、路径、行动或风险", "all": "全部", "health": "健康度", "projectType": "项目类型", "owner": "负责人", "customer": "客户", "stage": "当前阶段", "priority": "优先级", "sort": "排序", "table": "表格", "cards": "卡片", "localPath": "本地目录", "githubRepository": "GitHub 仓库", "gitBranch": "Git 分支", "lastCommit": "最后提交", "dirty": "未提交修改", "nextAction": "下一步行动", "blocker": "阻塞项", "risk": "风险", "scanStatus": "扫描状态", "enabled": "已启用", "disabled": "已关闭", "yes": "是", "no": "否", "details": "详情", "edit": "编辑", "scan": "扫描", "close": "关闭", "detached": "游离 HEAD", "noDescription": "暂无说明",
+    "newProject": "新增项目", "editProject": "编辑项目", "descriptionLabel": "项目说明", "staleDays": "无活动提醒天数", "scanEnabled": "启用只读扫描", "cancel": "取消", "save": "保存", "saving": "保存中...", "operationFailed": "操作失败", "basicInfo": "基本信息", "gitStatus": "Git 状态", "healthDetails": "健康度明细", "actionsAndRisks": "行动与风险", "relatedTasks": "关联任务", "scanHistory": "扫描历史", "headSha": "HEAD SHA", "changes": "变更文件", "aheadBehind": "领先 / 落后", "origin": "Origin", "lastScan": "最后扫描", "scanError": "扫描异常", "noHealthReasons": "暂无扣分项。", "noTasks": "暂无关联任务。", "noScans": "暂无扫描历史。", "scoreValue": "健康分 {score}", "openLocal": "打开本地目录", "openFolderConfirm": "是否在电脑上打开这个已登记项目目录？", "openGithub": "打开 GitHub", "disableScan": "关闭扫描", "enableScan": "重新启用扫描", "archive": "归档", "restore": "恢复",
+    "statuses": { "not_started": "未开始", "in_progress": "进行中", "waiting": "等待中", "blocked": "阻塞", "review": "审核中", "completed": "已完成", "paused": "已暂停", "archived": "已归档", "active": "进行中" },
+    "healthStates": { "healthy": "健康", "attention": "需要关注", "blocked": "阻塞", "stale": "长期无活动", "unknown": "未知" },
+    "priorities": { "low": "低", "medium": "中", "high": "高", "critical": "紧急" },
+    "sorts": { "priority": "异常优先", "activity": "最近活动", "score": "健康分最低", "name": "项目名称" },
+    "healthReasons": { "insufficient_data": "扫描数据不足", "directory_missing": "本地目录不存在：{value}", "git_timeout": "Git 命令超时：{value}", "git_failed": "无法读取 Git 元数据：{value}", "status_blocked": "项目被手动标记为阻塞", "stale_activity": "超过 {value} 天没有活动", "old_commit": "超过 {value} 天没有 Git 提交", "dirty_too_long": "工作区存在超过 {value} 天的未提交修改", "detached_head": "仓库处于游离 HEAD 状态", "missing_next_action": "没有登记下一步行动", "empty_in_progress_directory": "进行中项目的目录为空", "recent_failed_tasks": "最近有 {value} 个失败任务", "attention_required": "有 {value} 个任务需要人工确认" }
   },
   "codexStatus": {
     "title": "Codex", "description": "整理现有 Codex CLI 安装和本地会话观察能力，不增加新的执行机制。", "installation": "CLI 状态", "login": "登录状态", "version": "CLI 版本", "activeSessions": "活动会话", "tokenUsage": "可见 Token 用量", "checking": "正在检测...", "configurationError": "Codex 运行时检测返回错误，请在设置中检查本地 CLI 配置。", "sessions": "Codex 会话", "empty": "未发现 Codex 会话。", "session": "会话", "projectDirectory": "所属项目目录", "model": "当前模型", "tokens": "Token", "lastActivity": "最近活动", "state": "会话状态", "privacyNote": "本页面只使用现有运行时和会话 API，不读取或展示 auth.json。",
