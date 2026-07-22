@@ -48,7 +48,8 @@ async function runSyncTick(): Promise<void> {
     const projects = db.prepare(`
       SELECT id, github_repo, github_sync_enabled, github_default_branch, workspace_id
       FROM projects
-      WHERE github_sync_enabled = 1 AND github_repo IS NOT NULL AND status = 'active'
+      WHERE github_sync_enabled = 1 AND github_repo IS NOT NULL
+        AND status = 'in_progress' AND archived = 0
     `).all() as Array<{
       id: number
       github_repo: string

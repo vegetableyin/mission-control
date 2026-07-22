@@ -81,7 +81,7 @@ interface Project {
   name: string
   slug: string
   ticket_prefix: string
-  status: 'active' | 'archived'
+  status: string
 }
 
 interface MentionOption {

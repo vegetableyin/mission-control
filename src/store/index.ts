@@ -343,6 +343,41 @@ export interface Project {
   github_sync_enabled?: boolean
   github_labels_initialized?: boolean
   github_default_branch?: string
+  project_type?: string
+  local_path?: string | null
+  github_repository?: string | null
+  owner?: string | null
+  customer?: string | null
+  stage?: string | null
+  health_status?: 'healthy' | 'attention' | 'blocked' | 'stale' | 'unknown'
+  health_score?: number | null
+  health_reasons?: Array<{ code: string; deduction: number; detail?: string | number | null }>
+  priority?: 'low' | 'medium' | 'high' | 'critical'
+  next_action?: string | null
+  blocker?: string | null
+  last_activity_at?: number | null
+  last_scan_at?: number | null
+  archived?: boolean
+  scan_enabled?: boolean
+  stale_after_days?: number
+  git_branch?: string | null
+  git_head_sha?: string | null
+  git_last_commit_at?: number | null
+  git_last_commit_title?: string | null
+  git_dirty?: boolean | null
+  git_modified_count?: number | null
+  git_untracked_count?: number | null
+  git_ahead_count?: number | null
+  git_behind_count?: number | null
+  git_detached_head?: boolean | null
+  git_has_origin?: boolean | null
+  git_origin_url?: string | null
+  repository_accessible?: boolean | null
+  scan_error?: string | null
+  created_at?: number
+  updated_at?: number
+  unfinished_task_count?: number
+  failed_task_count?: number
 }
 
 export interface ConnectionStatus {

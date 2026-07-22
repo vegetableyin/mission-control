@@ -11,7 +11,7 @@ interface Project {
   slug: string
   description?: string
   ticket_prefix: string
-  status: 'active' | 'archived'
+  status: string
   github_repo?: string
   deadline?: number
   color?: string
@@ -123,7 +123,7 @@ export function ProjectManagerModal({
     try {
       await mutate(`/api/projects/${project.id}`, {
         method: 'PATCH',
-        body: JSON.stringify({ status: project.status === 'active' ? 'archived' : 'active' })
+        body: JSON.stringify({ status: project.status === 'archived' ? 'in_progress' : 'archived' })
       })
       await load()
       await onChanged?.()
@@ -290,7 +290,7 @@ export function ProjectManagerModal({
                       {project.slug !== 'general' && (
                         <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
                           <Button variant="outline" size="xs" onClick={() => archiveProject(project)}>
-                            {project.status === 'active' ? 'Archive' : 'Activate'}
+                            {project.status === 'archived' ? 'Activate' : 'Archive'}
                           </Button>
                           <Button variant="destructive" size="xs" onClick={() => deleteProject(project)}>
                             Delete

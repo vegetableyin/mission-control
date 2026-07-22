@@ -154,12 +154,46 @@ const projectAssignmentNamesSchema = z.array(
 
 const booleanFlagSchema = z.union([z.boolean(), z.literal(0), z.literal(1)])
 
-export const updateProjectSchema = z.object({
+export const projectLifecycleStatusSchema = z.enum([
+  'not_started', 'in_progress', 'waiting', 'blocked', 'review', 'completed', 'paused', 'archived',
+  'active', // legacy API compatibility; routes normalize this to in_progress
+])
+
+export const projectInventoryFieldsSchema = z.object({
+  project_type: z.string().trim().min(1).max(80).optional(),
+  local_path: z.string().trim().min(1).max(1024).nullable().optional(),
+  github_repository: z.string().trim().max(500).nullable().optional(),
+  owner: z.string().trim().max(200).nullable().optional(),
+  customer: z.string().trim().max(200).nullable().optional(),
+  stage: z.string().trim().max(200).nullable().optional(),
+  health_status: z.enum(['healthy', 'attention', 'blocked', 'stale', 'unknown']).optional(),
+  health_score: z.number().int().min(0).max(100).nullable().optional(),
+  priority: z.enum(['low', 'medium', 'high', 'critical']).optional(),
+  next_action: z.string().trim().max(2000).nullable().optional(),
+  blocker: z.string().trim().max(2000).nullable().optional(),
+  archived: booleanFlagSchema.optional(),
+  scan_enabled: booleanFlagSchema.optional(),
+  stale_after_days: z.number().int().min(1).max(3650).optional(),
+})
+
+export const createProjectInventorySchema = projectInventoryFieldsSchema.extend({
+  name: z.string().trim().min(1).max(200),
+  description: z.string().max(5000).nullable().optional(),
+  ticket_prefix: z.string().max(64).optional(),
+  ticketPrefix: z.string().max(64).optional(),
+  slug: z.string().max(200).optional(),
+  status: projectLifecycleStatusSchema.optional(),
+  github_repo: z.string().trim().max(500).nullable().optional(),
+  deadline: z.number().int().min(0).max(4102444800).nullable().optional(),
+  color: z.string().trim().max(32).nullable().optional(),
+}).strict()
+
+export const updateProjectSchema = projectInventoryFieldsSchema.extend({
   name: z.string().trim().min(1, 'Project name cannot be empty').max(200).optional(),
   description: z.string().max(5000).nullable().optional(),
   ticket_prefix: z.string().max(64).optional(),
   ticketPrefix: z.string().max(64).optional(),
-  status: z.enum(['active', 'archived']).optional(),
+  status: projectLifecycleStatusSchema.optional(),
   github_repo: z.string().trim().max(200).nullable().optional(),
   deadline: z.number().int().min(0).max(4102444800).nullable().optional(),
   color: z.string().trim().max(32).nullable().optional(),

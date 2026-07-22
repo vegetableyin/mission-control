@@ -773,7 +773,7 @@ function OrgRow({ label, initial, active, colorClass, onClick, isActiveOrg, proj
             >
               <div
                 className={`w-4 h-4 rounded flex items-center justify-center text-[8px] font-bold shrink-0 ${
-                  !project.color ? (project.status === 'active' ? 'bg-blue-500/20 text-blue-400' : 'bg-muted-foreground/10 text-muted-foreground') : ''
+                  !project.color ? (project.status !== 'archived' ? 'bg-blue-500/20 text-blue-400' : 'bg-muted-foreground/10 text-muted-foreground') : ''
                 }`}
                 style={project.color ? { backgroundColor: `${project.color}33`, color: project.color } : undefined}
               >{project.ticket_prefix?.slice(0, 2) || project.name?.[0]?.toUpperCase() || 'P'}</div>

@@ -31,7 +31,7 @@ function resolveProjectId(db: ReturnType<typeof getDatabase>, workspaceId: numbe
   if (typeof requestedProjectId === 'number' && Number.isFinite(requestedProjectId)) {
     const project = db.prepare(`
       SELECT id FROM projects
-      WHERE id = ? AND workspace_id = ? AND status = 'active'
+      WHERE id = ? AND workspace_id = ? AND archived = 0
       LIMIT 1
     `).get(requestedProjectId, workspaceId) as { id: number } | undefined
     if (project) return project.id
@@ -39,13 +39,13 @@ function resolveProjectId(db: ReturnType<typeof getDatabase>, workspaceId: numbe
 
   const fallback = db.prepare(`
     SELECT id FROM projects
-    WHERE workspace_id = ? AND status = 'active'
+    WHERE workspace_id = ? AND archived = 0
     ORDER BY CASE WHEN slug = 'general' THEN 0 ELSE 1 END, id ASC
     LIMIT 1
   `).get(workspaceId) as { id: number } | undefined
 
   if (!fallback) {
-    throw new Error('No active project available in workspace')
+    throw new Error('No available project in workspace')
   }
   return fallback.id
 }

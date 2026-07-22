@@ -7,6 +7,7 @@ import type Database from 'better-sqlite3'
 export type Migration = {
   id: string
   up: (db: Database.Database) => void
+  down?: (db: Database.Database) => void
   foreignKeysOff?: boolean
 }
 
@@ -1536,6 +1537,98 @@ const migrations: Migration[] = [
         CREATE INDEX idx_agents_source ON agents(source);
       `)
     }
+  },
+  {
+    id: '055_project_inventory',
+    up(db: Database.Database) {
+      const columns = db.prepare(`PRAGMA table_info(projects)`).all() as Array<{ name: string }>
+      const hasColumn = (name: string) => columns.some((column) => column.name === name)
+      const additions: Array<[string, string]> = [
+        ['project_type', `TEXT NOT NULL DEFAULT 'other'`],
+        ['local_path', 'TEXT DEFAULT NULL'],
+        ['github_repository', 'TEXT DEFAULT NULL'],
+        ['owner', 'TEXT DEFAULT NULL'],
+        ['customer', 'TEXT DEFAULT NULL'],
+        ['stage', 'TEXT DEFAULT NULL'],
+        ['health_status', `TEXT NOT NULL DEFAULT 'unknown'`],
+        ['health_score', 'INTEGER DEFAULT NULL'],
+        ['priority', `TEXT NOT NULL DEFAULT 'medium'`],
+        ['next_action', 'TEXT DEFAULT NULL'],
+        ['blocker', 'TEXT DEFAULT NULL'],
+        ['last_activity_at', 'INTEGER DEFAULT NULL'],
+        ['last_scan_at', 'INTEGER DEFAULT NULL'],
+        ['archived', 'INTEGER NOT NULL DEFAULT 0'],
+        ['scan_enabled', 'INTEGER NOT NULL DEFAULT 1'],
+        ['stale_after_days', 'INTEGER NOT NULL DEFAULT 7'],
+        ['git_branch', 'TEXT DEFAULT NULL'],
+        ['git_head_sha', 'TEXT DEFAULT NULL'],
+        ['git_last_commit_at', 'INTEGER DEFAULT NULL'],
+        ['git_last_commit_title', 'TEXT DEFAULT NULL'],
+        ['git_dirty', 'INTEGER DEFAULT NULL'],
+        ['git_modified_count', 'INTEGER DEFAULT NULL'],
+        ['git_untracked_count', 'INTEGER DEFAULT NULL'],
+        ['git_ahead_count', 'INTEGER DEFAULT NULL'],
+        ['git_behind_count', 'INTEGER DEFAULT NULL'],
+        ['git_detached_head', 'INTEGER DEFAULT NULL'],
+        ['git_has_origin', 'INTEGER DEFAULT NULL'],
+        ['git_origin_url', 'TEXT DEFAULT NULL'],
+        ['repository_accessible', 'INTEGER DEFAULT NULL'],
+        ['dirty_since_at', 'INTEGER DEFAULT NULL'],
+        ['health_reasons', 'TEXT DEFAULT NULL'],
+        ['scan_error', 'TEXT DEFAULT NULL'],
+      ]
+      for (const [name, definition] of additions) {
+        if (!hasColumn(name)) db.exec(`ALTER TABLE projects ADD COLUMN ${name} ${definition}`)
+      }
+
+      db.exec(`
+        UPDATE projects
+        SET status = CASE WHEN status = 'active' THEN 'in_progress' ELSE status END,
+            archived = CASE WHEN status = 'archived' THEN 1 ELSE archived END,
+            github_repository = COALESCE(github_repository, github_repo),
+            last_activity_at = COALESCE(last_activity_at, updated_at),
+            stale_after_days = CASE WHEN stale_after_days < 1 THEN 7 ELSE stale_after_days END
+      `)
+      db.exec(`
+        CREATE INDEX IF NOT EXISTS idx_projects_workspace_inventory
+          ON projects(workspace_id, archived, health_status, status);
+        CREATE INDEX IF NOT EXISTS idx_projects_workspace_local_path
+          ON projects(workspace_id, local_path);
+        CREATE TABLE IF NOT EXISTS project_scan_history (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          workspace_id INTEGER NOT NULL,
+          project_id INTEGER NOT NULL,
+          status TEXT NOT NULL,
+          duration_ms INTEGER NOT NULL DEFAULT 0,
+          git_json TEXT,
+          health_json TEXT,
+          error TEXT,
+          created_at INTEGER NOT NULL DEFAULT (unixepoch()),
+          FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
+        );
+        CREATE INDEX IF NOT EXISTS idx_project_scan_history_project_created
+          ON project_scan_history(workspace_id, project_id, created_at DESC);
+      `)
+    },
+    down(db: Database.Database) {
+      db.exec(`DROP TABLE IF EXISTS project_scan_history`)
+      db.exec(`DROP INDEX IF EXISTS idx_projects_workspace_inventory`)
+      db.exec(`DROP INDEX IF EXISTS idx_projects_workspace_local_path`)
+      db.exec(`UPDATE projects SET status = 'active' WHERE status = 'in_progress'`)
+      const removable = [
+        'project_type', 'local_path', 'github_repository', 'owner', 'customer', 'stage',
+        'health_status', 'health_score', 'priority', 'next_action', 'blocker',
+        'last_activity_at', 'last_scan_at', 'archived', 'scan_enabled', 'stale_after_days',
+        'git_branch', 'git_head_sha', 'git_last_commit_at', 'git_last_commit_title',
+        'git_dirty', 'git_modified_count', 'git_untracked_count', 'git_ahead_count',
+        'git_behind_count', 'git_detached_head', 'git_has_origin', 'git_origin_url',
+        'repository_accessible', 'dirty_since_at', 'health_reasons', 'scan_error',
+      ]
+      const existing = new Set((db.prepare(`PRAGMA table_info(projects)`).all() as Array<{ name: string }>).map((column) => column.name))
+      for (const name of removable) {
+        if (existing.has(name)) db.exec(`ALTER TABLE projects DROP COLUMN ${name}`)
+      }
+    }
   }
 ]
 
@@ -1571,4 +1664,14 @@ export function runMigrations(db: Database.Database) {
       if (restoreForeignKeys) db.pragma('foreign_keys = ON')
     }
   }
+}
+
+export function rollbackMigration(db: Database.Database, id: string): void {
+  const migration = [...migrations, ...extraMigrations].find((candidate) => candidate.id === id)
+  if (!migration) throw new Error(`Unknown migration: ${id}`)
+  if (!migration.down) throw new Error(`Migration ${id} is not reversible`)
+  db.transaction(() => {
+    migration.down?.(db)
+    db.prepare('DELETE FROM schema_migrations WHERE id = ?').run(id)
+  })()
 }
