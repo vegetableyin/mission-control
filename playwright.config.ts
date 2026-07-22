@@ -31,6 +31,7 @@ export default defineConfig({
       MC_WORKLOAD_ERROR_RATE_THROTTLE: process.env.MC_WORKLOAD_ERROR_RATE_THROTTLE || '1',
       MC_WORKLOAD_ERROR_RATE_SHED: process.env.MC_WORKLOAD_ERROR_RATE_SHED || '1',
       MC_DISABLE_RUNTIME_SCAN: process.env.MC_DISABLE_RUNTIME_SCAN || '1',
+      MC_AWESOME_OPENCLAW_README_FIXTURE: 'tests/fixtures/awesome-openclaw/README.md',
       API_KEY: process.env.API_KEY || 'test-api-key-e2e-12345',
       AUTH_USER: process.env.AUTH_USER || 'testadmin',
       AUTH_PASS: process.env.AUTH_PASS || 'testpass1234!',

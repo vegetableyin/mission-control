@@ -59,12 +59,22 @@ test.describe('Skills Registry', () => {
     const res = await request.get('/api/skills/registry?source=awesome-openclaw&q=git', {
       headers: API_KEY_HEADER,
     })
-    expect(res.status()).toBe(200)
-    const body = await res.json()
+    const responseText = await res.text()
+    expect(res.status(), responseText).toBe(200)
+    const body = JSON.parse(responseText)
     expect(body).toHaveProperty('skills')
     expect(body).toHaveProperty('total')
     expect(body.source).toBe('awesome-openclaw')
     expect(Array.isArray(body.skills)).toBe(true)
+    expect(body.total).toBe(1)
+    expect(body.skills).toEqual([
+      expect.objectContaining({
+        slug: 'fixture-author/git-workflow',
+        name: 'Git Workflow',
+        description: 'Deterministic Git workflow fixture for Playwright.',
+        source: 'awesome-openclaw',
+      }),
+    ])
   })
 
   // ── POST /api/skills/registry (install) ───────

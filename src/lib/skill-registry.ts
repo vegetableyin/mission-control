@@ -6,8 +6,8 @@
  */
 
 import { createHash } from 'node:crypto'
-import { mkdir } from 'node:fs/promises'
-import { join } from 'node:path'
+import { mkdir, readFile } from 'node:fs/promises'
+import { join, resolve } from 'node:path'
 import { homedir } from 'node:os'
 import { resolveWithin } from './paths'
 import { logger } from './logger'
@@ -241,16 +241,12 @@ async function fetchAwesomeIndex(): Promise<RegistrySkill[]> {
     return awesomeCache.skills
   }
   try {
-    const controller = new AbortController()
-    const timer = setTimeout(() => controller.abort(), 15_000)
-    let res: Response
-    try {
-      res = await fetch(AWESOME_OPENCLAW_README, { signal: controller.signal })
-    } finally {
-      clearTimeout(timer)
-    }
-    if (!res.ok) throw new Error(`GitHub fetch failed (${res.status})`)
-    const markdown = await res.text()
+    const fixturePath = process.env.MISSION_CONTROL_TEST_MODE === '1'
+      ? process.env.MC_AWESOME_OPENCLAW_README_FIXTURE
+      : undefined
+    const markdown = fixturePath
+      ? await readFile(resolve(fixturePath), 'utf8')
+      : await fetchAwesomeReadme()
     const skills = parseAwesomeReadme(markdown)
     awesomeCache = { skills, fetchedAt: now }
     return skills
@@ -258,6 +254,18 @@ async function fetchAwesomeIndex(): Promise<RegistrySkill[]> {
     logger.warn({ err: err.message }, 'Awesome OpenClaw fetch error')
     if (awesomeCache) return awesomeCache.skills // stale fallback
     return []
+  }
+}
+
+async function fetchAwesomeReadme(): Promise<string> {
+  const controller = new AbortController()
+  const timer = setTimeout(() => controller.abort(), 15_000)
+  try {
+    const res = await fetch(AWESOME_OPENCLAW_README, { signal: controller.signal })
+    if (!res.ok) throw new Error(`GitHub fetch failed (${res.status})`)
+    return await res.text()
+  } finally {
+    clearTimeout(timer)
   }
 }
 
