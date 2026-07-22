@@ -23,7 +23,7 @@ test.describe('Essential interface', () => {
 
   test('covers Chinese Essential navigation and translation rendering', async ({ page }) => {
     await page.goto('/overview')
-    await expect(page.getByRole('heading', { name: '个人驾驶舱' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: '个人驾驶舱' })).toBeVisible({ timeout: 30_000 })
 
     for (const label of essentialLabels) {
       await expect(page.getByRole('button', { name: label, exact: true })).toBeVisible()

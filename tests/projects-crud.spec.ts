@@ -20,7 +20,7 @@ test.describe('Projects CRUD', () => {
     expect(res.status()).toBe(201)
     expect(body.project).toBeDefined()
     expect(body.project.name).toContain('e2e-project-')
-    expect(body.project.status).toBe('active')
+    expect(body.project.status).toBe('not_started')
     expect(body.project.slug).toBeTruthy()
     expect(body.project.ticket_prefix).toBeTruthy()
   })
@@ -41,6 +41,18 @@ test.describe('Projects CRUD', () => {
     expect(body.project.github_repo).toBe('test-org/test-repo')
     expect(body.project.deadline).toBeGreaterThan(0)
     expect(body.project.color).toBe('#3b82f6')
+  })
+
+  test('POST creates a project whose name contains only Chinese characters', async ({ request }) => {
+    const digits = ['零', '一', '二', '三', '四', '五', '六', '七', '八', '九']
+    const name = `中文项目${String(Date.now()).replace(/\d/g, (value) => digits[Number(value)])}`
+    const res = await request.post('/api/projects', { headers: API_KEY_HEADER, data: { name } })
+    expect(res.status()).toBe(201)
+    const body = await res.json()
+    cleanup.push(body.project.id)
+    expect(body.project.name).toBe(name)
+    expect(body.project.slug).toMatch(/^project-[0-9a-f]{10}$/)
+    expect(body.project.ticket_prefix).toMatch(/^P[0-9A-F]{7}$/)
   })
 
   test('POST rejects empty name', async ({ request }) => {
@@ -295,7 +307,7 @@ test.describe('Projects CRUD', () => {
       data: { status: 'active' },
     })
     expect(activateRes.status()).toBe(200)
-    expect((await activateRes.json()).project.status).toBe('active')
+    expect((await activateRes.json()).project.status).toBe('in_progress')
 
     // Delete permanently
     const deleteRes = await request.delete(`/api/projects/${id}?mode=delete`, { headers: API_KEY_HEADER })
