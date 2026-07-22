@@ -39,6 +39,8 @@ test.describe('Essential interface', () => {
     await page.reload()
     await expect(page.getByRole('button', { name: '记忆', exact: true })).toBeVisible()
 
+    await page.getByRole('button', { name: '设置', exact: true }).click()
+    await expect(page.getByRole('heading', { name: '界面模式', exact: true })).toBeVisible({ timeout: 30_000 })
     await page.getByRole('button', { name: /精简模式 Essential/ }).click()
     await expect(page.getByRole('button', { name: '记忆', exact: true })).toHaveCount(0)
     await page.reload()

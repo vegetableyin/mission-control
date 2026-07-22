@@ -119,6 +119,7 @@
     "more": "More"
   },
   "settings": {
+    "loading": "Loading settings...",
     "language": "Language",
     "languageDescription": "Choose your preferred display language",
     "general": "General",

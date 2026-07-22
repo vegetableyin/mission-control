@@ -219,6 +219,9 @@ export function SettingsPanel() {
       const data = await res.json()
       setSettings(data.settings || [])
       setGrouped(data.grouped || {})
+      // Core settings are ready. Agent/session previews below are optional and
+      // must not keep the whole panel behind a loading state when they are slow.
+      setLoading(false)
       // Load hook profile from settings
       const hpSetting = (data.settings || []).find((s: Setting) => s.key === 'hook_profile')
       if (hpSetting) setHookProfile(hpSetting.value)
@@ -392,7 +395,7 @@ export function SettingsPanel() {
   }
 
   if (loading) {
-    return <Loader variant="panel" label="Loading settings" />
+    return <Loader variant="panel" label={t('loading')} />
   }
 
   if (error) {
